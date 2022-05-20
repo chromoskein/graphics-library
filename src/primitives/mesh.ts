@@ -58,6 +58,7 @@ export class Mesh implements HighLevelStructure {
         if (type == null || type == LowLevelStructure.Triangle) {
             const f32View = buffer.f32View;
             const i32View = buffer.i32View;
+            const u8View = buffer.u8view;
 
             for (let i = 0; i < this._triangles.length; i++) {
                 const triangleOffset = offset + i;
@@ -69,6 +70,7 @@ export class Mesh implements HighLevelStructure {
                     const vertex = triangle[v];
 
                     f32View.set(vertex.position, localOffsetWords + v * 4);
+                    u8View.set([vertex.color[0] * 255, vertex.color[1] * 255, vertex.color[2] * 255, vertex.color[3] * 255], localOffsetBytes + 96 + v * 4);
                 }
 
                 i32View.set([this._partOfBVH ? 1 : 0], localOffsetWords + 29);
