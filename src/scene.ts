@@ -7,6 +7,7 @@ import { BoundingBox } from "./shared";
 import { vec3, vec4 } from "gl-matrix";
 import { NODE_SIZE_BYTES, BOUNDING_BOX_SIZE_BYTES } from "./bvh";
 import { Spline } from "./primitives/spline";
+import { Mesh, Triangle } from "./primitives/mesh";
 
 function enumValues<T extends string>(enumObj: { [key: string]: T }): IterableIterator<T>;
 function enumValues<T extends string | number>(enumObj: { [key: string]: T }): IterableIterator<Exclude<T, string>>;
@@ -297,6 +298,17 @@ export class Scene {
         return [sphereIndex, sphere];
     }
 
+    public addMesh(structureName: string, triangles: Array<Triangle>, partOfBVH = true, update = true) {
+        this.removeStructureByName(structureName);
+
+        this.lastStructureID += 1;
+
+        const mesh = new Mesh(this.graphicsLibrary, this.lastStructureID, partOfBVH, triangles);
+        const meshIndex = this.addStructure(structureName, mesh, update);
+
+        return [meshIndex, mesh];
+    }
+
     public addSpheres(structureName: string, points: Array<vec3>, radius: number | null = null, colors: Array<vec4> | null = null, partOfBVH = true, update = true): [number, Spheres] {
         this.removeStructureByName(structureName);
 
@@ -452,19 +464,22 @@ export class Scene {
             });
         }
 
+
         passEncoder.setBindGroup(1, this.bufferBindGroup);
-        for (let typeIndex = 0; typeIndex < 5; typeIndex++) {
+        for (let typeIndex = 0; typeIndex <= 5; typeIndex++) {
             if (renderObjects == RenderObjects.Opaque) {
                 switch (typeIndex) {
                     case 0: passEncoder.setPipeline(renderPipelines.spheresWriteDepth); break;
                     case 2: passEncoder.setPipeline(renderPipelines.quadraticBeziersWriteDepth); break;
                     case 4: passEncoder.setPipeline(renderPipelines.roundedConesWriteDepth); break;
+                    case 5: passEncoder.setPipeline(renderPipelines.trianglesWriteDepth); break;
                     default: continue;
                 }
             } else {
                 switch (typeIndex) {
                     case 0: passEncoder.setPipeline(renderPipelines.spheresDiscardDepth); break;
                     case 4: passEncoder.setPipeline(renderPipelines.roundedConesDiscardDepth); break;
+                    case 5: passEncoder.setPipeline(renderPipelines.trianglesDiscardDepth); break;
                     default: continue;
                 }
 
@@ -482,8 +497,11 @@ export class Scene {
                     const count = structure.countOf(typeIndex);
                     const offset = structure.offsetOf(typeIndex);
 
-                    if (count != null && count > 0 && offset != null) {
-                        passEncoder.draw(4, count, 0, offset);
+                    if (count != null && count > 0 && offset != null) {                        
+                        switch (typeIndex) {
+                            case 5: passEncoder.draw(3 * count, 1, 3 * offset, 0); break;
+                            default: passEncoder.draw(4, count, 0, offset);
+                        }
                     }
                 }
             }

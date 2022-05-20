@@ -1,5 +1,5 @@
 import { ShaderModules } from "../shaders";
-import { aabbsPipelineDescriptor, cylindersPipelineDescriptor, roundedConesPipelineDescriptor, quadraticBeziersPipelineDescriptor, spheresPipelineDescriptor, gBufferWorldPositionsBindGroupLayout } from "./primitives";
+import { aabbsPipelineDescriptor, cylindersPipelineDescriptor, roundedConesPipelineDescriptor, quadraticBeziersPipelineDescriptor, spheresPipelineDescriptor, gBufferWorldPositionsBindGroupLayout, trianglesPipelineDescriptor } from "./primitives";
 import { cameraBindGroupLayout, primitivesBindGroupLayout, primitivesPipelineLayout, passthroughPipelineLayout, passthroughBindGroupLayout, passthroughPipelineDescriptor, renderGBufferBindGroupLayout, renderGBufferPipelineLayout, renderGBufferPipelineDescriptor, primitivesTextureBindGroupLayout, primitivesTexturePipelineLayout, cullObjectsBindGroupLayout } from "./default_layouts";
 import { BindGroupLayouts, PipelineLayouts, RenderPipelines, ComputePipelines } from "./shared";
 import { distanceMapBindGroupLayout, distanceMapPipelineDescriptor, tadmapPipelineDescriptor, distanceMapPipelineLayout } from "./2d";
@@ -46,6 +46,8 @@ export function createRenderPipelines(device: GPUDevice, shaderModules: ShaderMo
     };
 
     const renderPipelines = {
+        trianglesWriteDepth: device.createRenderPipeline(trianglesPipelineDescriptor(device, bindGroupLayouts, pipelineLayouts, shaderModules, true)),
+        trianglesDiscardDepth: device.createRenderPipeline(trianglesPipelineDescriptor(device, bindGroupLayouts, pipelineLayouts, shaderModules, false)),
         spheresWriteDepth: device.createRenderPipeline(spheresPipelineDescriptor(device, bindGroupLayouts, pipelineLayouts, shaderModules, true)),
         spheresDiscardDepth: device.createRenderPipeline(spheresPipelineDescriptor(device, bindGroupLayouts, pipelineLayouts, shaderModules, false)),
         cylindersWriteDepth: device.createRenderPipeline(cylindersPipelineDescriptor(pipelineLayouts, shaderModules, true)),

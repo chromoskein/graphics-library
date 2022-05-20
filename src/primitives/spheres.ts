@@ -64,6 +64,7 @@ export class Spheres implements HighLevelStructure {
 
         if (type == null || type == LowLevelStructure.Sphere) {
             for (let i = 0; i < this._centers.length; i++) {
+                // console.log(this._colors[i]);
                 writeSphereToArrayBuffer(buffer, offset + i, {
                     center: this._centers[i],
                     radius: this._radius,
@@ -144,6 +145,10 @@ export class Spheres implements HighLevelStructure {
     }
 
     //#region Setters & Getters
+    public get centers(): Array<vec3> {
+        return this._centers;
+    }
+
     public get radius(): number {
         return this._radius;
     }

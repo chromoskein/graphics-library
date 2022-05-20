@@ -62,6 +62,52 @@ export function gBufferWorldPositionsBindGroupLayout(): GPUBindGroupLayoutDescri
     };
 }
 
+export function trianglesPipelineDescriptor(device: GPUDevice, bindGroupLayouts: BindGroupLayouts, pipelineLayouts: PipelineLayouts, shaderModules: ShaderModules, depth: boolean): GPURenderPipelineDescriptor {
+    if (depth) {
+        return {
+            label: 'Triangles Pipeline Descriptor',
+            layout: pipelineLayouts.primitives,
+            vertex: {
+                module: depth ? shaderModules.trianglesWriteDepth : shaderModules.trianglesDiscardDepth,
+                entryPoint: "main_vertex",
+            },
+            fragment: {
+                module: depth ? shaderModules.trianglesWriteDepth : shaderModules.trianglesDiscardDepth,
+                entryPoint: "main_fragment",
+                targets: gBufferOutputs(depth),    
+            },
+            primitive: {
+                topology: 'triangle-list',
+            },
+            depthStencil: depthDescription(depth),
+        };
+    }
+
+    const pipelineLayout = device.createPipelineLayout({
+        bindGroupLayouts: [
+            bindGroupLayouts.camera, bindGroupLayouts.primitives, bindGroupLayouts.cullObjects, bindGroupLayouts.gBufferWorldPositionsBindGroupLayout
+        ],
+    })
+
+    return {
+        label: 'Triangles Pipeline Descriptor (without depth)',
+        layout: pipelineLayout,
+        vertex: {
+            module: depth ? shaderModules.trianglesWriteDepth : shaderModules.trianglesDiscardDepth,
+            entryPoint: "main_vertex",
+        },
+        fragment: {
+            module: depth ? shaderModules.trianglesWriteDepth : shaderModules.trianglesDiscardDepth,
+            entryPoint: "main_fragment",
+            targets: gBufferOutputs(depth),
+
+        },
+        primitive: {
+            topology: 'triangle-list',
+        },
+    };
+}
+
 export function spheresPipelineDescriptor(device: GPUDevice, bindGroupLayouts: BindGroupLayouts, pipelineLayouts: PipelineLayouts, shaderModules: ShaderModules, depth: boolean): GPURenderPipelineDescriptor {
     if (depth) {
         return {

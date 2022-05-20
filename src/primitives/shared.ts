@@ -11,7 +11,7 @@ export enum LowLevelStructure {
     QuadraticBezierCurve = 2,
     AABB = 3,
     RoundedCone = 4,
-    PolygonalMesh = 5,
+    Triangle = 5,
     None = 9999,
 }
 

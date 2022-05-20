@@ -8,6 +8,7 @@ import primitiveBeziers from "./beziers.wgsl";
 import { beziers } from "./primitives/beziers";
 import { aabbs } from "./primitives/aabbs";
 import { roundedCones } from "./primitives/rounded_cones";
+import { triangles } from "./primitives/triangles";
 
 import rayTracingGBuffer from "./raytrace_gbuffer.wgsl";
 import rayTracingAmbientOcclusion from "./raytrace_ao.wgsl";
@@ -33,6 +34,8 @@ export function createShaderModules(device: GPUDevice): ShaderModules {
 
     const shaders = {
         //#region Rasterization - primitives
+        trianglesWriteDepth: device.createShaderModule({ code: primitivesBase + triangles(true) }),
+        trianglesDiscardDepth: device.createShaderModule({ code: primitivesBase + triangles(false) }),
         spheresWriteDepth: device.createShaderModule({ code: primitivesBase + spheres(true) }),
         spheresDiscardDepth: device.createShaderModule({ code: primitivesBase + spheres(false) }),
         cylindersWriteDepth: device.createShaderModule({ code: primitivesBase + cylinders(true) }),
