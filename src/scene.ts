@@ -37,7 +37,7 @@ export class Scene {
     private graphicsLibrary: GraphicsLibrary;
 
     private lastStructureID = 0;
-    private structures: Array<HighLevelStructure> = [];
+    private _structures: Array<HighLevelStructure> = [];
     private nameToStructure: Map<string, number> = new Map();
 
     private objectTypesCount: Array<number> = new Array(128);
@@ -116,7 +116,7 @@ export class Scene {
         allocator.deallocateArray(this._nodesBuffer);
 
         this.lastStructureID = 0;
-        this.structures = [];
+        this._structures = [];
         this.nameToStructure.clear();
         this._objectsSum = 0;
 
@@ -133,7 +133,7 @@ export class Scene {
 
         // Count the number of each object type
         this.objectTypesCount.fill(0);
-        for (const structure of this.structures) {
+        for (const structure of this._structures) {
             if (structure == null) {
                 continue;
             }
@@ -174,7 +174,7 @@ export class Scene {
                 continue;
             }
 
-            for (const structure of this.structures) {
+            for (const structure of this._structures) {
                 if (structure == null) {
                     continue;
                 }
@@ -204,7 +204,7 @@ export class Scene {
 
         // Check if there is a need to rebuild BVH
         let needsRebuild = false;
-        for (const structure of this.structures) {
+        for (const structure of this._structures) {
             if (structure.partOfBVH() && structure.dirtyBVH()) {
                 needsRebuild = true;
 
@@ -350,7 +350,7 @@ export class Scene {
 
         const structureID = structure.getID();
 
-        this.structures.push(structure);
+        this._structures.push(structure);
         this.nameToStructure.set(structureName, structureID);
 
         if (!update) {
@@ -397,14 +397,14 @@ export class Scene {
     }
 
     public removeStructureByID(structureID: number, update = true): void {
-        const structureIndex = this.structures.findIndex(s => s.getID() == structureID);
+        const structureIndex = this._structures.findIndex(s => s.getID() == structureID);
 
         if (structureIndex < 0) {
             return;
         }
 
-        this.structures[structureIndex].removeFromArrayBuffer();
-        this.structures.splice(structureIndex, 1);
+        this._structures[structureIndex].removeFromArrayBuffer();
+        this._structures.splice(structureIndex, 1);
 
         if (update && this._useBVH) {
             this.buildBVH();
@@ -418,17 +418,17 @@ export class Scene {
             return;
         }
 
-        const structureIndex = this.structures.findIndex(s => s.getID() == structureID);
+        const structureIndex = this._structures.findIndex(s => s.getID() == structureID);
 
         if (structureIndex < 0) {
             return;
         }
 
-        const partOfBVH = this.structures[structureIndex].partOfBVH();
+        const partOfBVH = this._structures[structureIndex].partOfBVH();
 
-        this.structures[structureIndex].removeFromArrayBuffer();
+        this._structures[structureIndex].removeFromArrayBuffer();
 
-        this.structures.splice(structureIndex, 1);
+        this._structures.splice(structureIndex, 1);
         this.nameToStructure.delete(structureName);
 
         if (partOfBVH && update && this._useBVH) {
@@ -488,8 +488,12 @@ export class Scene {
                 }                
             }
 
-            for (const structure of this.structures) {
-                if ((structure.opaque && renderObjects == RenderObjects.Transparent) || (!structure.opaque && renderObjects == RenderObjects.Opaque)) {
+            for (const structure of this._structures) {
+                if (
+                    structure.hidden
+                    || (structure.opaque && renderObjects == RenderObjects.Transparent) 
+                    || (!structure.opaque && renderObjects == RenderObjects.Opaque)
+                ) {
                     continue;
                 }
 
@@ -601,6 +605,10 @@ export class Scene {
         return this._buffer;
     }
 
+    public get structures(): Array<HighLevelStructure> {
+        return this._structures;
+    }
+
     public getStructureByName(structureName: string): HighLevelStructure | null {
         const structureID = this.nameToStructure.get(structureName);
 
@@ -608,22 +616,23 @@ export class Scene {
             return null;
         }
 
-        const structureIndex = this.structures.findIndex(s => s.getID() == structureID);
+        const structureIndex = this._structures.findIndex(s => s.getID() == structureID);
 
         if (structureIndex < 0) {
             return null;
         }
 
-        return this.structures[structureIndex];
+        return this._structures[structureIndex];
     }
 
     public getStructureByID(structureID: number): HighLevelStructure | null {
-        const structureIndex = this.structures.findIndex(s => s.getID() == structureID);
+        const structureIndex = this._structures.findIndex(s => s.getID() == structureID);
+        console.log(structureID, structureIndex);
 
         if (structureIndex < 0) {
             return null;
         }
 
-        return this.structures[structureIndex];
+        return this._structures[structureIndex];
     }
 }

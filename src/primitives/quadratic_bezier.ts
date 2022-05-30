@@ -142,7 +142,7 @@ export class QuadraticBezier {
     }
 }
 
-export class QuadraticBezierCurve implements HighLevelStructure {
+export class QuadraticBezierCurve extends HighLevelStructure {
     private graphicsLibrary: GraphicsLibrary;
     private buffer: LinearImmutableArray | null = null;
     private id = -1;
@@ -164,17 +164,10 @@ export class QuadraticBezierCurve implements HighLevelStructure {
 
     private _partOfBVH: boolean;
     private _dirtyBVH: boolean;
-    private _opaque = true;
-
-    public set opaque(opaque: boolean) {
-        this._opaque = opaque;
-    }
-
-    public get opaque(): boolean {
-        return this._opaque;
-    }
 
     constructor(graphicsLibrary: GraphicsLibrary, id: number, partOfBVH = true, p0: vec3, p1: vec3, p2: vec3, radius = 0.05) {
+        super();
+
         this.graphicsLibrary = graphicsLibrary;
 
         this.id = id;

@@ -4,7 +4,7 @@ import { LowLevelStructure, HighLevelStructure, LL_STRUCTURE_SIZE, LL_STRUCTURE_
 import { writeSphereToArrayBuffer } from "./sphere";
 import { GraphicsLibrary } from "..";
 
-export class Spheres implements HighLevelStructure {
+export class Spheres extends HighLevelStructure {
     private graphicsLibrary: GraphicsLibrary;
     private buffer: LinearImmutableArray | null = null;
     private id: number;
@@ -12,7 +12,7 @@ export class Spheres implements HighLevelStructure {
     private _spheresPosition = 0;
 
     private _centers: Array<vec3>;
-    private _radius: number;
+    private _radius: Array<number>;
 
     //#region Style
     private _colors: Array<vec4>;
@@ -21,24 +21,18 @@ export class Spheres implements HighLevelStructure {
 
     private _partOfBVH: boolean;
     private _dirtyBVH: boolean;
-    private _opaque = true;
-
-    public set opaque(opaque: boolean) {
-        this._opaque = opaque;
-    }
-
-    public get opaque(): boolean {
-        return this._opaque;
-    }
 
     constructor(graphicsLibrary: GraphicsLibrary, id: number, partOfBVH = true, points: Array<vec3>, colors: Array<vec4> | null = null) {
+        super();
+
         this.graphicsLibrary = graphicsLibrary;
 
         this.id = id;
         this._centers = points;
         this._partOfBVH = partOfBVH;
         this._dirtyBVH = true;
-        this._radius = 0.0;
+
+        this._radius = new Array(this._centers.length).fill(0.0);
 
         if (colors == null) {
             this._colors = new Array(this._centers.length);
@@ -67,7 +61,7 @@ export class Spheres implements HighLevelStructure {
                 // console.log(this._colors[i]);
                 writeSphereToArrayBuffer(buffer, offset + i, {
                     center: this._centers[i],
-                    radius: this._radius,
+                    radius: this._radius[i],
                     color: this._colors[i],
                     borderColor: this._borderColors[i],
                     partOfBVH: this._partOfBVH,
@@ -150,13 +144,25 @@ export class Spheres implements HighLevelStructure {
     }
 
     public get radius(): number {
-        return this._radius;
+        return this._radius[0];
     }
 
     public set radius(radius: number) {
-        this._radius = radius;
+        this._radius.fill(radius);
 
         this.buffer?.setModifiedBytes({ start: this._spheresPosition * LL_STRUCTURE_SIZE_BYTES, end: (this._spheresPosition + this._centers.length) * LL_STRUCTURE_SIZE_BYTES });
+        this._dirtyBVH = true;
+    }
+
+    public setRadius(i: number, radius: number) {
+        this._radius[i] = radius;
+
+        if (!this.buffer) return;
+
+        writeSphereToArrayBuffer(this.buffer, this._spheresPosition + i, { radius });
+
+        this.setModified(i, false);
+
         this._dirtyBVH = true;
     }
 

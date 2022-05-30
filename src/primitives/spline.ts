@@ -8,7 +8,7 @@ import { LowLevelStructure, HighLevelStructure, LL_STRUCTURE_SIZE, LL_STRUCTURE_
  * 
  * 
  */
-export class Spline implements HighLevelStructure {
+export class Spline extends HighLevelStructure {
     private catmullRomPoints: Array<vec3>;
     private cubicBezierPoints: Array<vec3>;
     private quadraticBeziers: Array<QuadraticBezier>;
@@ -26,15 +26,6 @@ export class Spline implements HighLevelStructure {
 
     private _partOfBVH: boolean;
     private _dirtyBVH: boolean;
-    private _opaque = true;
-
-    public set opaque(opaque: boolean) {
-        this._opaque = opaque;
-    }
-
-    public get opaque(): boolean {
-        return this._opaque;
-    }
 
     public partOfBVH(): boolean {
         return this._partOfBVH;
@@ -62,6 +53,8 @@ export class Spline implements HighLevelStructure {
         partOfBVH = true,
         points: Array<vec3>,
         radius = 0.01,) {
+        super();
+
         this.graphicsLibrary = graphicsLibrary;
         this.id = id;
         this._partOfBVH = partOfBVH;
@@ -81,7 +74,7 @@ export class Spline implements HighLevelStructure {
         this.catmullRomPoints.push(endPoint);
 
         const newPoints = [];
-        for(let i = 0; i < this.catmullRomPoints.length - 1; i++) {
+        for (let i = 0; i < this.catmullRomPoints.length - 1; i++) {
             // newPoints.push(this.catmullRomPoints[i]);
             const newPoint = vec3.scale(vec3.create(), vec3.add(vec3.create(), this.catmullRomPoints[i], this.catmullRomPoints[i + 1]), 0.5);
             newPoints.push(newPoint);
@@ -255,11 +248,11 @@ export class Spline implements HighLevelStructure {
         this._dirtyBVH = true;
     }
 
-    public resetColors(color: vec4): void {       
+    public resetColors(color: vec4): void {
         if (!this.buffer) return;
 
         const f32View = this.buffer.f32View;
-        for (let i = 0; i < this.quadraticBeziers.length; i++) {            
+        for (let i = 0; i < this.quadraticBeziers.length; i++) {
             const offsetWords = (this._bufferPosition + i) * LL_STRUCTURE_SIZE;
 
             this._colors[i] = vec4.clone(color);
@@ -270,11 +263,11 @@ export class Spline implements HighLevelStructure {
         this.buffer.setModifiedBytes({ start: this._bufferPosition * LL_STRUCTURE_SIZE_BYTES, end: (this._bufferPosition + this.quadraticBeziers.length) * LL_STRUCTURE_SIZE_BYTES });
     }
 
-    public resetBorderColors(color: vec4): void {       
+    public resetBorderColors(color: vec4): void {
         if (!this.buffer) return;
 
         const f32View = this.buffer.f32View;
-        for (let i = 0; i < this.quadraticBeziers.length; i++) {            
+        for (let i = 0; i < this.quadraticBeziers.length; i++) {
             const offsetWords = (this._bufferPosition + i) * LL_STRUCTURE_SIZE;
 
             this._borderColors[i] = vec4.clone(color);
@@ -285,11 +278,11 @@ export class Spline implements HighLevelStructure {
         this.buffer.setModifiedBytes({ start: this._bufferPosition * LL_STRUCTURE_SIZE_BYTES, end: (this._bufferPosition + this.quadraticBeziers.length) * LL_STRUCTURE_SIZE_BYTES });
     }
 
-    public resetColorBorder(color: vec4): void {       
+    public resetColorBorder(color: vec4): void {
         if (!this.buffer) return;
 
         const f32View = this.buffer.f32View;
-        for (let i = 0; i < this.quadraticBeziers.length; i++) {            
+        for (let i = 0; i < this.quadraticBeziers.length; i++) {
             const offsetWords = (this._bufferPosition + i) * LL_STRUCTURE_SIZE;
 
             this._colors[i] = vec4.clone(color);
@@ -307,9 +300,9 @@ export class Spline implements HighLevelStructure {
 
         for (let i = 0; i < 2; i++) {
             const offsetWords = (this._bufferPosition + 2 * segment + i) * LL_STRUCTURE_SIZE;
-    
+
             this._colors[2 * segment + i] = vec4.clone(color);
-    
+
             this.buffer.f32View.set(color, offsetWords + 12);
         }
 
@@ -321,9 +314,9 @@ export class Spline implements HighLevelStructure {
 
         for (let i = 0; i < 2; i++) {
             const offsetWords = (this._bufferPosition + 2 * segment + i) * LL_STRUCTURE_SIZE;
-    
+
             this._borderColors[2 * segment + i] = vec4.clone(color);
-    
+
             this.buffer.f32View.set(color, offsetWords + 16);
         }
 
@@ -334,7 +327,7 @@ export class Spline implements HighLevelStructure {
         if (!this.buffer || colors.length < this.quadraticBeziers.length) return;
 
         const f32View = this.buffer.f32View;
-        for (let i = 0; i < this.quadraticBeziers.length; i++) {            
+        for (let i = 0; i < this.quadraticBeziers.length; i++) {
             const offsetWords = (this._bufferPosition + i) * LL_STRUCTURE_SIZE;
 
             this._colors[i] = vec4.clone(colors[i]);
@@ -349,7 +342,7 @@ export class Spline implements HighLevelStructure {
         if (!this.buffer || colors.length < this.quadraticBeziers.length) return;
 
         const f32View = this.buffer.f32View;
-        for (let i = 0; i < this.quadraticBeziers.length; i++) {            
+        for (let i = 0; i < this.quadraticBeziers.length; i++) {
             const offsetWords = (this._bufferPosition + i) * LL_STRUCTURE_SIZE;
 
             this._borderColors[i] = vec4.clone(colors[i]);

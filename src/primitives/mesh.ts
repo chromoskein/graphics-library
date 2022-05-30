@@ -13,7 +13,7 @@ export type Vertex = {
 
 export type Triangle = Array<Vertex>;
 
-export class Mesh implements HighLevelStructure {
+export class Mesh extends HighLevelStructure {
     private graphicsLibrary: GraphicsLibrary;
     private buffer: LinearImmutableArray | null = null;
     private id: number;
@@ -24,17 +24,10 @@ export class Mesh implements HighLevelStructure {
 
     private _partOfBVH: boolean;
     private _dirtyBVH: boolean;
-    private _opaque = true;
-
-    public set opaque(opaque: boolean) {
-        this._opaque = opaque;
-    }
-
-    public get opaque(): boolean {
-        return this._opaque;
-    }
 
     constructor(graphicsLibrary: GraphicsLibrary, id: number, partOfBVH = true, triangles: Array<Triangle>) {
+        super();
+
         this.graphicsLibrary = graphicsLibrary;
 
         this.id = id;

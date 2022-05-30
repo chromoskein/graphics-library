@@ -3,7 +3,7 @@ import { GraphicsLibrary } from "..";
 import { LinearImmutableArray } from "../allocators";
 import { LowLevelStructure, HighLevelStructure, LL_STRUCTURE_SIZE_BYTES, LL_STRUCTURE_SIZE } from "./shared";
 
-export class AABB implements HighLevelStructure {
+export class AABB extends HighLevelStructure {
     private graphicsLibrary: GraphicsLibrary;
     private buffer: LinearImmutableArray | null = null;
     private id = -1;
@@ -19,17 +19,10 @@ export class AABB implements HighLevelStructure {
 
     private _partOfBVH: boolean;
     private _dirtyBVH: boolean;
-    private _opaque = true;
-
-    public set opaque(opaque: boolean) {
-        this._opaque = opaque;
-    }
-
-    public get opaque(): boolean {
-        return this._opaque;
-    }
 
     constructor(graphicsLibrary: GraphicsLibrary, id: number, partOfBVH = true, from: vec3, to: vec3) {
+        super();
+
         this.graphicsLibrary = graphicsLibrary;
 
         this.id = id;

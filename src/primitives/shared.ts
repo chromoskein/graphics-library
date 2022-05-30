@@ -21,7 +21,7 @@ export function typeOfPrimitive(view: DataView, offset: number): LowLevelStructu
     return view.getInt32(offsetBytes + 124, true);
 }
 
-export interface HighLevelStructure {
+export class HighLevelStructure {
     /**
      * writeToArrayBuffer
      * 
@@ -31,38 +31,60 @@ export interface HighLevelStructure {
      * 
      * @returns number of low level structures that were written
      */
-    writeToArrayBuffer(buffer: LinearImmutableArray, offset: number, type: LowLevelStructure | null): number;
+    public writeToArrayBuffer(buffer: LinearImmutableArray, offset: number, type: LowLevelStructure | null): number {
+        return 0;
+    };
 
     /**
      * Removes the structure from the *buffer* by zeroing out type variable in each low level structure
      */
-    removeFromArrayBuffer(): void;
+    public removeFromArrayBuffer(): void {
+
+    };
 
     /**
      * 
      * @param type 
      */
-    offsetOf(type: LowLevelStructure | null): number | null;
+    public offsetOf(type: LowLevelStructure | null): number | null { return null; };
 
     /**
      * 
      * @param type 
      */
-    countOf(type: LowLevelStructure | null): number;
+    public countOf(type: LowLevelStructure | null): number { return 0; };
 
     /**
      * 
      * @param type 
      * @param offset 
      */
-    localOffsetOf(type: LowLevelStructure, offset: number): number;
+    public localOffsetOf(type: LowLevelStructure, offset: number): number { return 0; };
 
-    getID(): number;
+    public getID(): number { return -1; };
 
-    partOfBVH(): boolean;
-    dirtyBVH(): boolean;
-    setCleanBVH(): void;
-    setDirtyBVH(): void;
+    public partOfBVH(): boolean { return false; };
+    public dirtyBVH(): boolean { return false; };
+    public setCleanBVH(): void {};
+    public setDirtyBVH(): void {};
 
-    opaque: boolean;
+    protected _opaque = true;
+
+    public set opaque(opaque: boolean) {
+        this._opaque = opaque;
+    }
+
+    public get opaque(): boolean {
+        return this._opaque;
+    }
+
+    protected _hidden = false;
+
+    public set hidden(hidden: boolean) {
+        this._hidden = hidden;
+    }
+
+    public get hidden(): boolean {
+        return this._hidden;
+    }
 }

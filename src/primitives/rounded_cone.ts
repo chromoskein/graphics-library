@@ -115,7 +115,7 @@ export function roundedConeToBoundingBox(array: ArrayViews, offset: number): Bou
     return result;
 }
 
-export class RoundedCone implements HighLevelStructure {
+export class RoundedCone extends HighLevelStructure {
     private graphicsLibrary: GraphicsLibrary;
     private buffer: LinearImmutableArray | null = null;
     private id = -1;
@@ -136,17 +136,10 @@ export class RoundedCone implements HighLevelStructure {
 
     private _partOfBVH: boolean;
     private _dirtyBVH: boolean;
-    private _opaque = true;
-
-    public set opaque(opaque: boolean) {
-        this._opaque = opaque;
-    }
-
-    public get opaque(): boolean {
-        return this._opaque;
-    }
 
     constructor(graphicsLibrary: GraphicsLibrary, id: number, partOfBVH: boolean, from: vec3, to: vec3, radius = 1.0, leftPlane: vec4 = vec4.fromValues(0.0, 0.0, 0.0, 0.0), rightPlane: vec4 = vec4.fromValues(0.0, 0.0, 0.0, 0.0)) {
+        super();
+
         this.graphicsLibrary = graphicsLibrary;
 
         this.id = id;

@@ -9,7 +9,7 @@ export enum GradientPrecision {
     P100 = 100,
 }
 
-export class ContinuousTube implements HighLevelStructure {
+export class ContinuousTube extends HighLevelStructure {
     private _points: Array<vec3>;
     private _radius: number;
 
@@ -32,15 +32,6 @@ export class ContinuousTube implements HighLevelStructure {
 
     private _partOfBVH: boolean;
     private _dirtyBVH: boolean;
-    private _opaque = true;
-
-    public set opaque(opaque: boolean) {
-        this._opaque = opaque;
-    }
-
-    public get opaque(): boolean {
-        return this._opaque;
-    }
 
     constructor(
         graphicsLibrary: GraphicsLibrary,
@@ -50,6 +41,8 @@ export class ContinuousTube implements HighLevelStructure {
         radius = 1.0,
         colors: Array<vec4> | null = null,
         borderColors: Array<vec4> | null = null) {
+        super();
+
         this.graphicsLibrary = graphicsLibrary;
         this.id = id;
         this._partOfBVH = partOfBVH;
@@ -488,7 +481,7 @@ export class ContinuousTube implements HighLevelStructure {
             this._colors2[i] = color2;
 
             u8view.set([color[0] * 255, color[1] * 255, color[2] * 255, color[3] * 255,
-                        color2[0] * 255, color2[1] * 255, color2[2] * 255, color2[3] * 255], offsetBytes + 64);
+            color2[0] * 255, color2[1] * 255, color2[2] * 255, color2[3] * 255], offsetBytes + 64);
             // u8view.set([color2[0] * 255, color2[1] * 255, color2[2] * 255, color2[3] * 255], offsetBytes + 68);
         }
 
