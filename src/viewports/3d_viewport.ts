@@ -384,9 +384,9 @@ export class Viewport3D {
       this._context == null ||
       this.depthTexture == null ||
       this.outputTexture == null ||
-      this.gBuffer == null 
+      this.gBuffer == null
       // this.scene.bvh == null
-      ) {
+    ) {
       return;
     }
 
@@ -513,35 +513,7 @@ export class Viewport3D {
     gBufferRasterizeOpaquePass.setBindGroup(2, cullObjectsBindGroup);
     this.scene.renderRasterization(gBufferRasterizeOpaquePass, this._camera, RenderObjects.Opaque, null);
     gBufferRasterizeOpaquePass.end();
-
-    // commandEncoder.writeTimestamp(this.timestampsQuerySet, 1);
-    const gBufferRasterizeTransparentPass = commandEncoder.beginRenderPass({
-      colorAttachments: [
-        {
-          view: this.gBuffer.colorsTransparent.createView(),
-          clearValue: { r: 0.0, g: 0.0, b: 0.0, a: 0.0 },
-          loadOp: 'clear',
-          storeOp: 'store',
-        }
-      ]
-    });
-
-    gBufferRasterizeTransparentPass.setBindGroup(0, device.createBindGroup({
-      label: "Camera BG",
-      layout: bindGroupLayouts.camera,
-      entries: [
-        {
-          binding: 0, resource: { buffer: this._camera.bufferGPU, offset: 0 }
-        },
-      ]
-    }));
-    gBufferRasterizeTransparentPass.setBindGroup(2, cullObjectsBindGroup);
-    this.scene.renderRasterization(gBufferRasterizeTransparentPass, this._camera, RenderObjects.Transparent, this.depthTexture.createView());
-    gBufferRasterizeTransparentPass.end();
-
-    //#endregion
-
-    const computePassEncoder = commandEncoder.beginComputePass();
+    //#endregion    
 
     //#region Ray Trace G-Buffer    
     // this.scene.renderRayTracingGBuffer({
@@ -562,6 +534,7 @@ export class Viewport3D {
     // });
     //#endregion
 
+    const computePassEncoder = commandEncoder.beginComputePass();
     if (this.rayTraceAO) {
       this._scene.renderRayTracingAmbientOcclusion({
         width: this.width,
@@ -636,7 +609,7 @@ export class Viewport3D {
       device.createBindGroup({
         layout: this.graphicsLibrary.bindGroupLayouts.ssaoJoin,
         entries: [
-          { binding: 0, resource: this.gBuffer.ambientOcclusion[0].createView() },          
+          { binding: 0, resource: this.gBuffer.ambientOcclusion[0].createView() },
           { binding: 1, resource: this.gBuffer.ambientOcclusion[1].createView() },
           { binding: 2, resource: this.gBuffer.ambientOcclusion[2].createView() },
         ],
@@ -652,7 +625,7 @@ export class Viewport3D {
       device.createBindGroup({
         layout: this.graphicsLibrary.bindGroupLayouts.aoBlurIO,
         entries: [
-          { binding: 0, resource: this.gBuffer.ambientOcclusion[2].createView() },          
+          { binding: 0, resource: this.gBuffer.ambientOcclusion[2].createView() },
           { binding: 1, resource: this.gBuffer.worldNormals.createView() },
           { binding: 2, resource: this.depthTexture.createView() },
           { binding: 3, resource: this.gBuffer.ambientOcclusion[1].createView() },
@@ -663,27 +636,38 @@ export class Viewport3D {
       Math.ceil((this.width + 7) / 8),
       Math.ceil((this.height + 7) / 8),
     );
-
-
-    // computePassEncoder.setBindGroup(0,
-    //   device.createBindGroup({
-    //     layout: this.graphicsLibrary.bindGroupLayouts.aoBlurIO,
-    //     entries: [
-    //       { binding: 0, resource: this.gBuffer.ambientOcclusion[1].createView() },          
-    //       { binding: 1, resource: this.gBuffer.worldNormals.createView() },
-    //       { binding: 2, resource: this.depthTexture.createView() },
-    //       { binding: 3, resource: this.gBuffer.ambientOcclusion[0].createView() },
-    //     ],
-    //   })
-    // );
-    // computePassEncoder.dispatch(
-    //   Math.ceil((this.width + 7) / 8),
-    //   Math.ceil((this.height + 7) / 8),
-    // );
-
     computePassEncoder.end();
 
-    // commandEncoder.writeTimestamp(this.timestampsQuerySet, 2);
+    const gBufferRasterizeTransparentPass = commandEncoder.beginRenderPass({
+      colorAttachments: [
+        {
+          view: this.gBuffer.colorsTransparent.createView(),
+          clearValue: { r: 0.0, g: 0.0, b: 0.0, a: 0.0 },
+          loadOp: 'clear',
+          storeOp: 'store',
+        }
+      ],
+      depthStencilAttachment: {
+        view: this.depthTexture.createView(),
+
+        depthLoadOp: 'load',
+        depthStoreOp: 'discard',
+      }
+    });
+
+    gBufferRasterizeTransparentPass.setBindGroup(0, device.createBindGroup({
+      label: "Camera BG",
+      layout: bindGroupLayouts.camera,
+      entries: [
+        {
+          binding: 0, resource: { buffer: this._camera.bufferGPU, offset: 0 }
+        },
+      ]
+    }));
+    gBufferRasterizeTransparentPass.setBindGroup(2, cullObjectsBindGroup);
+    this.scene.renderRasterization(gBufferRasterizeTransparentPass, this._camera, RenderObjects.Transparent, this.depthTexture.createView());
+    gBufferRasterizeTransparentPass.end();
+
 
     const passthroughPassEncoder = commandEncoder.beginRenderPass({
       colorAttachments: [
@@ -736,28 +720,8 @@ export class Viewport3D {
     passthroughPassEncoder.draw(3, 1, 0, 0);
     passthroughPassEncoder.end();
 
-    // commandEncoder.resolveQuerySet(this.timestampsQuerySet, 0, 3, this.timestampsBuffer, 0);
-    // commandEncoder.copyBufferToBuffer(this.timestampsBuffer, 0, this.timestampsResolvedBuffer, 0, 4 * 8);
-
     const commandBuffer = commandEncoder.finish();
     device.queue.submit([commandBuffer]);
-
-    // await this.timestampsResolvedBuffer.mapAsync(GPUMapMode.READ);
-    // const timestamps = this.timestampsResolvedBuffer.getMappedRange();
-    // const timestampsDataView = new DataView(new Uint8Array(timestamps).buffer);
-
-    // const left = timestampsDataView.getUint32(0, true);
-    // const right = timestampsDataView.getUint32(4, true); 
-    // const combined = left + 2 ** 32 * right;
-    // const left2 = timestampsDataView.getUint32(8, true);
-    // const right2 = timestampsDataView.getUint32(12, true);
-    // const combined2 = left2 + 2 ** 32 * right2;    
-    // const left3 = timestampsDataView.getUint32(16, true);
-    // const right3 = timestampsDataView.getUint32(20, true);
-    // const combined3 = left3 + 2 ** 32 * right3;    
-
-    // this.timestampsResolvedBuffer.unmap();
-    // console.log((combined2 - combined) / 1000000.0, (combined3 - combined2) / 1000000.0);
 
     this.dirty = false;
   }

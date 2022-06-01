@@ -24,8 +24,6 @@ struct SpheresBuffer {
 @group(1) @binding(0) var<storage, read> spheresBuffer: SpheresBuffer;
 @group(2) @binding(0) var<storage, read> cullObjectsBuffer: CullObjectsBuffer;
 
-${writeDepth ? '' : '@group(3) @binding(0) var gBufferDepth : texture_depth_2d;'} 
-
 struct VertexOutput {
   @builtin(position) Position : vec4<f32>,
   @location(0) sphere : vec4<f32>,
@@ -134,40 +132,40 @@ fn main_fragment(@builtin(position) Position : vec4<f32>,
     outputColor = borderColor;
   }
 
-  ${writeDepth ? `` : `
-  let intersection2: vec3<f32> = camera.position.xyz + t.y * ray.direction.xyz;
-  var intersection2ViewSpace = camera.projectionView * vec4<f32>(intersection2, 1.0);
-  intersection2ViewSpace.z = intersection2ViewSpace.z / intersection2ViewSpace.w;
+  // ${writeDepth ? `` : `
+  // let intersection2: vec3<f32> = camera.position.xyz + t.y * ray.direction.xyz;
+  // var intersection2ViewSpace = camera.projectionView * vec4<f32>(intersection2, 1.0);
+  // intersection2ViewSpace.z = intersection2ViewSpace.z / intersection2ViewSpace.w;
   
-  let ndcDepth = textureLoad(gBufferDepth, vec2<i32>(Position.xy), 0);
-  // var worldPositionViewSpace = camera.projectionView * vec4<f32>(textureLoad(gBufferWorldPositions, vec2<i32>(Position.xy), 0).xyz, 1.0);
-  // worldPositionViewSpace.z = worldPositionViewSpace.z / worldPositionViewSpace.w;
+  // let ndcDepth = textureLoad(gBufferDepth, vec2<i32>(Position.xy), 0);
+  // // var worldPositionViewSpace = camera.projectionView * vec4<f32>(textureLoad(gBufferWorldPositions, vec2<i32>(Position.xy), 0).xyz, 1.0);
+  // // worldPositionViewSpace.z = worldPositionViewSpace.z / worldPositionViewSpace.w;
 
-  if (intersection2ViewSpace.z > ndcDepth) {
-    outputColor = vec4<f32>(color.xyz, 0.6);  
+  // if (intersection2ViewSpace.z > ndcDepth) {
+  //   outputColor = vec4<f32>(color.xyz, 0.6);  
 
-    let normal2 = normalize(intersection2 - sphere.position);
-    if (abs(dot(normal2, vec3<f32>(0.0, 1.0, 0.0))) < 0.01) 
-    {
-      outputColor = vec4<f32>(0.7, 0.7, 0.7, 1.0);
-    }
-    if (abs(dot(normal2, vec3<f32>(1.0, 0.0, 0.0))) < 0.01) 
-    {
-      outputColor = vec4<f32>(0.7, 0.7, 0.7, 1.0);
-    }      
-  } else {
-    outputColor = vec4<f32>(color.xyz, 0.4);
-  }
+  //   let normal2 = normalize(intersection2 - sphere.position);
+  //   if (abs(dot(normal2, vec3<f32>(0.0, 1.0, 0.0))) < 0.01) 
+  //   {
+  //     outputColor = vec4<f32>(0.7, 0.7, 0.7, 1.0);
+  //   }
+  //   if (abs(dot(normal2, vec3<f32>(1.0, 0.0, 0.0))) < 0.01) 
+  //   {
+  //     outputColor = vec4<f32>(0.7, 0.7, 0.7, 1.0);
+  //   }      
+  // } else {
+  //   outputColor = vec4<f32>(color.xyz, 0.4);
+  // }
 
-  if (abs(dot(normal, vec3<f32>(0.0, 1.0, 0.0))) < 0.01) 
-  {
-    outputColor = vec4<f32>(0.7, 0.7, 0.7, 1.0);
-  }
-  if (abs(dot(normal, vec3<f32>(1.0, 0.0, 0.0))) < 0.01) 
-  {
-    outputColor = vec4<f32>(0.7, 0.7, 0.7, 1.0);
-  }
-  `}
+  // if (abs(dot(normal, vec3<f32>(0.0, 1.0, 0.0))) < 0.01) 
+  // {
+  //   outputColor = vec4<f32>(0.7, 0.7, 0.7, 1.0);
+  // }
+  // if (abs(dot(normal, vec3<f32>(1.0, 0.0, 0.0))) < 0.01) 
+  // {
+  //   outputColor = vec4<f32>(0.7, 0.7, 0.7, 1.0);
+  // }
+  // `}
   
   // Final write
   return FragmentOutput(

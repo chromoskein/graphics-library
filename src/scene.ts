@@ -298,7 +298,7 @@ export class Scene {
         return [sphereIndex, sphere];
     }
 
-    public addMesh(structureName: string, triangles: Array<Triangle>, partOfBVH = true, update = true) {
+    public addMesh(structureName: string, triangles: Array<Triangle>, partOfBVH = true, update = true): [number, Mesh] {
         this.removeStructureByName(structureName);
 
         this.lastStructureID += 1;
@@ -454,15 +454,15 @@ export class Scene {
         const renderPipelines = this.graphicsLibrary.renderPipelines;
 
         let gBufferWorldPositions = null;
-        if (depth) {
-            gBufferWorldPositions = device.createBindGroup({
-                layout: this.graphicsLibrary.bindGroupLayouts.gBufferWorldPositionsBindGroupLayout,
-                entries: [{
-                    binding: 0,
-                    resource: depth
-                }]
-            });
-        }
+        // if (depth) {
+        //     gBufferWorldPositions = device.createBindGroup({
+        //         layout: this.graphicsLibrary.bindGroupLayouts.gBufferWorldPositionsBindGroupLayout,
+        //         entries: [{
+        //             binding: 0,
+        //             resource: depth
+        //         }]
+        //     });
+        // }
 
 
         passEncoder.setBindGroup(1, this.bufferBindGroup);
@@ -483,15 +483,15 @@ export class Scene {
                     default: continue;
                 }
 
-                if (depth && gBufferWorldPositions) {
-                    passEncoder.setBindGroup(3, gBufferWorldPositions);
-                }                
+                // if (depth && gBufferWorldPositions) {
+                //     passEncoder.setBindGroup(3, gBufferWorldPositions);
+                // }                
             }
 
             for (const structure of this._structures) {
                 if (
                     structure.hidden
-                    || (structure.opaque && renderObjects == RenderObjects.Transparent) 
+                    || (structure.opaque && renderObjects == RenderObjects.Transparent)
                     || (!structure.opaque && renderObjects == RenderObjects.Opaque)
                 ) {
                     continue;
@@ -501,7 +501,7 @@ export class Scene {
                     const count = structure.countOf(typeIndex);
                     const offset = structure.offsetOf(typeIndex);
 
-                    if (count != null && count > 0 && offset != null) {                        
+                    if (count != null && count > 0 && offset != null) {
                         switch (typeIndex) {
                             case 5: passEncoder.draw(3 * count, 1, 3 * offset, 0); break;
                             default: passEncoder.draw(4, count, 0, offset);
@@ -627,7 +627,6 @@ export class Scene {
 
     public getStructureByID(structureID: number): HighLevelStructure | null {
         const structureIndex = this._structures.findIndex(s => s.getID() == structureID);
-        console.log(structureID, structureIndex);
 
         if (structureIndex < 0) {
             return null;

@@ -58,7 +58,6 @@ export class Spheres extends HighLevelStructure {
 
         if (type == null || type == LowLevelStructure.Sphere) {
             for (let i = 0; i < this._centers.length; i++) {
-                // console.log(this._colors[i]);
                 writeSphereToArrayBuffer(buffer, offset + i, {
                     center: this._centers[i],
                     radius: this._radius[i],
@@ -152,6 +151,10 @@ export class Spheres extends HighLevelStructure {
 
         this.buffer?.setModifiedBytes({ start: this._spheresPosition * LL_STRUCTURE_SIZE_BYTES, end: (this._spheresPosition + this._centers.length) * LL_STRUCTURE_SIZE_BYTES });
         this._dirtyBVH = true;
+    }
+
+    public getRadius(i: number): number {
+        return this._radius[i];
     }
 
     public setRadius(i: number, radius: number) {

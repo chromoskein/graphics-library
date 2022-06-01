@@ -16,7 +16,7 @@ const gBufferOutputs = (writeDepth: boolean): Array<GPUColorTargetState> => writ
         format: GBUFFER_NORMAL_FORMAT,
     }
 ] : [
-    // Color
+    // Transparent Color
     {
         format: "rgba8unorm",
         blend: {
@@ -35,32 +35,12 @@ const gBufferOutputs = (writeDepth: boolean): Array<GPUColorTargetState> => writ
 ];
 
 const depthDescription = (writeDepth: boolean): GPUDepthStencilState => {
-    return writeDepth ? {
+    return {
         depthWriteEnabled: true,
         depthCompare: 'greater',
         format: 'depth32float',
-    } : {
-        depthWriteEnabled: false,
-        depthCompare: 'greater',
-        format: 'depth32float',
-    };
+    }
 };
-
-export function gBufferWorldPositionsBindGroupLayout(): GPUBindGroupLayoutDescriptor {
-    return {
-        entries: [
-            {
-                binding: 0,
-                visibility: GPUShaderStage.FRAGMENT,
-                texture: {
-                    sampleType: 'depth',
-                    viewDimension: '2d',
-                    multisampled: false,
-                }
-            }
-        ]
-    };
-}
 
 export function trianglesPipelineDescriptor(device: GPUDevice, bindGroupLayouts: BindGroupLayouts, pipelineLayouts: PipelineLayouts, shaderModules: ShaderModules, depth: boolean): GPURenderPipelineDescriptor {
     if (depth) {
@@ -85,7 +65,7 @@ export function trianglesPipelineDescriptor(device: GPUDevice, bindGroupLayouts:
 
     const pipelineLayout = device.createPipelineLayout({
         bindGroupLayouts: [
-            bindGroupLayouts.camera, bindGroupLayouts.primitives, bindGroupLayouts.cullObjects, bindGroupLayouts.gBufferWorldPositionsBindGroupLayout
+            bindGroupLayouts.camera, bindGroupLayouts.primitives, bindGroupLayouts.cullObjects
         ],
     })
 
@@ -102,6 +82,7 @@ export function trianglesPipelineDescriptor(device: GPUDevice, bindGroupLayouts:
             targets: gBufferOutputs(depth),
 
         },
+        depthStencil: depthDescription(depth),
         primitive: {
             topology: 'triangle-list',
         },
@@ -133,7 +114,7 @@ export function spheresPipelineDescriptor(device: GPUDevice, bindGroupLayouts: B
 
     const pipelineLayout = device.createPipelineLayout({
         bindGroupLayouts: [
-            bindGroupLayouts.camera, bindGroupLayouts.primitives, bindGroupLayouts.cullObjects, bindGroupLayouts.gBufferWorldPositionsBindGroupLayout
+            bindGroupLayouts.camera, bindGroupLayouts.primitives, bindGroupLayouts.cullObjects
         ],
     })
 
@@ -150,6 +131,7 @@ export function spheresPipelineDescriptor(device: GPUDevice, bindGroupLayouts: B
             targets: gBufferOutputs(depth),
 
         },
+        depthStencil: depthDescription(depth),
         primitive: {
             topology: 'triangle-strip',
             stripIndexFormat: 'uint32',
@@ -234,6 +216,6 @@ export function roundedConesPipelineDescriptor(pipelineLayouts: PipelineLayouts,
             topology: 'triangle-strip',
             stripIndexFormat: 'uint32',
         },
-        depthStencil: depth ? depthDescription(depth) : undefined,
+        depthStencil: depthDescription(depth),
     };
 }

@@ -90,7 +90,7 @@ fn main_fragment(
   @location(1) normal : vec3<f32>,
 ) -> FragmentOutput {
   return FragmentOutput(
-    vec4<f32>(color.xyz, 1.0),
+    color,
     ${writeDepth ? '0.5 * vec4<f32>(normal.xyz, 1.0) + vec4<f32>(0.5),' : ''}
   );  
 }

@@ -26,8 +26,6 @@ export function createRenderPipelines(device: GPUDevice, shaderModules: ShaderMo
         aoBlurParameters: device.createBindGroupLayout(aoBlurParametersBindGroupLayout()),
         aoBlurIO: device.createBindGroupLayout(aoBlurIOBindGroupLayout()),
 
-        gBufferWorldPositionsBindGroupLayout: device.createBindGroupLayout(gBufferWorldPositionsBindGroupLayout()),
-
         distanceMap: device.createBindGroupLayout(distanceMapBindGroupLayout()),
     };
 
