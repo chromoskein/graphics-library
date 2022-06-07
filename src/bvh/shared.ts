@@ -538,7 +538,6 @@ export function intersectQuadraticBezier(buffer: DataView, ray: Ray, offset: num
 
 export function interesectTriangle(buffer: DataView, ray: Ray, offset: number, cullObjects: Array<CullObject> = []): number {
     const byteOffset = offset * LL_STRUCTURE_SIZE_BYTES;
-    console.log('triangle interesct');
 
     const v0 = vec3.fromValues(
         buffer.getFloat32(byteOffset + 0, true),

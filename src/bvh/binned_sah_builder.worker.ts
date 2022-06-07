@@ -22,13 +22,13 @@ class Bin {
     rightCost = 0;
 }
 
-export type BVHResult = {
+type BVHResult = {
     nodes: Array<Node>;
     bboxes: Array<BoundingBox>;
     nodeCount: number;
 };
 
-export function buildBVHBinnedSAH(
+function buildBVHBinnedSAH(
     bboxes: Array<BoundingBox>,
     global_bbox: BoundingBox,
 ): BVHResult {
@@ -250,7 +250,6 @@ ctx.onmessage = ({ data: { objectsBuffer } }) => {
         const objectType = arrayViews.i32View[objectOffsetWords + 31];
 
         if (objectType != LowLevelStructure.None && partOfBVH) {
-            console.log(objectType);
             switch (objectType) {
                 case LowLevelStructure.Sphere: bboxes.push(sphereToBoundingBox(arrayViews, i)); break;
                 case LowLevelStructure.Cylinder: bboxes.push(cylinderToBoundingBox(objectsBuffer, i)); break;

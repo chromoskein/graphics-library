@@ -8,6 +8,7 @@ import { vec3, vec4 } from "gl-matrix";
 import { NODE_SIZE_BYTES, BOUNDING_BOX_SIZE_BYTES } from "./bvh";
 import { Spline } from "./primitives/spline";
 import { Mesh, Triangle } from "./primitives/mesh";
+import BinnedSAHBuilderWorker from "./bvh/binned_sah_builder.worker";
 
 function enumValues<T extends string>(enumObj: { [key: string]: T }): IterableIterator<T>;
 function enumValues<T extends string | number>(enumObj: { [key: string]: T }): IterableIterator<Exclude<T, string>>;
@@ -203,19 +204,19 @@ export class Scene {
         }
 
         // Check if there is a need to rebuild BVH
-        let needsRebuild = false;
-        for (const structure of this._structures) {
-            if (structure.partOfBVH() && structure.dirtyBVH()) {
-                needsRebuild = true;
+        // let needsRebuild = false;
+        // for (const structure of this._structures) {
+        //     if (structure.partOfBVH() && structure.dirtyBVH()) {
+        //         needsRebuild = true;
 
-                structure.setCleanBVH();
-            }
-        }
+        //         structure.setCleanBVH();
+        //     }
+        // }
 
-        if (!needsRebuild) {
-            console.timeEnd('scene::buildBVH');
-            return;
-        }
+        // if (!needsRebuild) {
+        //     console.timeEnd('scene::buildBVH');
+        //     return;
+        // }
 
         const allocator = this.graphicsLibrary.allocator;
 
@@ -223,7 +224,7 @@ export class Scene {
         const copyOfObjectsBuffer = this._buffer.cpuBuffer().slice(this._buffer.data.byteOffset, this._buffer.data.byteOffset + this._buffer.data.byteLength);
         // console.timeEnd('scene::buildBVH::bboxes');
 
-        this.bvhWorker = new Worker(new URL('./bvh/binned_sah_builder.worker.js', import.meta.url));
+        this.bvhWorker = new BinnedSAHBuilderWorker();
         this.bvhWorker.onmessage = ({ data: { result } }) => {
             // console.time('scene::buildBVH::Finish');
             if (result == null) {

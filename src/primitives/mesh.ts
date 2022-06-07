@@ -32,16 +32,14 @@ export function triangleToBoundingBox(array: ArrayViews, offset: number): Boundi
         array.f32View[offset * LL_STRUCTURE_SIZE + 9],
         array.f32View[offset * LL_STRUCTURE_SIZE + 10]
     );
-    
+
     const radius = array.f32View[offset * LL_STRUCTURE_SIZE + 3];
-    
+
     BoundingBoxExtendByPoint(result, p0);
     BoundingBoxExtendByPoint(result, p1);
     BoundingBoxExtendByPoint(result, p2);
 
     BoundingBoxCalculateCenter(result);
-    
-    console.log(result);
 
     return result;
 }
@@ -92,7 +90,7 @@ export class Mesh extends HighLevelStructure {
                 const localOffsetBytes = triangleOffset * LL_STRUCTURE_SIZE_BYTES;
 
                 const triangle = this._triangles[i];
-                for(let v = 0; v < 3; v++) {
+                for (let v = 0; v < 3; v++) {
                     const vertex = triangle[v];
 
                     f32View.set(vertex.position, localOffsetWords + v * 4);
@@ -170,6 +168,19 @@ export class Mesh extends HighLevelStructure {
     private setModified(i: number, dirtyBVH = true) {
         this.buffer?.setModifiedBytes({ start: this._trianglesPosition * LL_STRUCTURE_SIZE_BYTES, end: (this._trianglesPosition + i) * LL_STRUCTURE_SIZE_BYTES });
         this._dirtyBVH = dirtyBVH;
+    }
+
+    public setTriangleColor(i: number, vertexIndex: number, color: vec4): void {
+        this._triangles[i][vertexIndex].color = color;
+
+        const triangleOffset = this._trianglesPosition + i;
+        const localOffsetBytes = triangleOffset * LL_STRUCTURE_SIZE_BYTES;
+
+        if (this.buffer) {
+            this.buffer.u8view.set([color[0] * 255, color[1] * 255, color[2] * 255, color[3] * 255], localOffsetBytes + 96 + vertexIndex * 4);
+        }
+
+        this.buffer?.setModifiedBytes({ start: this._trianglesPosition * LL_STRUCTURE_SIZE_BYTES, end: (this._trianglesPosition + i) * LL_STRUCTURE_SIZE_BYTES });
     }
 
     //#region Setters & Getters
