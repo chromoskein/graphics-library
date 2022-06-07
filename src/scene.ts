@@ -196,7 +196,7 @@ export class Scene {
     }
 
     public buildBVH(): void {
-        // console.time('scene::buildBVH');
+        console.time('scene::buildBVH');
 
         if (this.bvhWorker != null) {
             this.bvhWorker.terminate();
@@ -213,7 +213,7 @@ export class Scene {
         }
 
         if (!needsRebuild) {
-            // console.timeEnd('scene::buildBVH');
+            console.timeEnd('scene::buildBVH');
             return;
         }
 
@@ -223,7 +223,7 @@ export class Scene {
         const copyOfObjectsBuffer = this._buffer.cpuBuffer().slice(this._buffer.data.byteOffset, this._buffer.data.byteOffset + this._buffer.data.byteLength);
         // console.timeEnd('scene::buildBVH::bboxes');
 
-        this.bvhWorker = new Worker(new URL('./bvh/binned_sah_builder.worker.ts', import.meta.url));
+        this.bvhWorker = new Worker(new URL('./bvh/binned_sah_builder.worker.js', import.meta.url));
         this.bvhWorker.onmessage = ({ data: { result } }) => {
             // console.time('scene::buildBVH::Finish');
             if (result == null) {
@@ -284,7 +284,7 @@ export class Scene {
             // console.timeEnd('scene::buildBVH::Finish');
         };
         this.bvhWorker.postMessage({ objectsBuffer: copyOfObjectsBuffer });
-        // console.timeEnd('scene::buildBVH');
+        console.timeEnd('scene::buildBVH');
     }
 
     public addSphere(structureName: string, point: vec3, radius: number | null = null, color: vec4 | null = null, partOfBVH = true, update = true): [number, Sphere] {

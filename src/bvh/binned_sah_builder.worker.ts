@@ -10,6 +10,7 @@ import { partition } from "lodash";
 import { cylinderToBoundingBox, LL_STRUCTURE_SIZE, LL_STRUCTURE_SIZE_BYTES, LowLevelStructure, roundedConeToBoundingBox, sphereToBoundingBox } from "../primitives";
 import { ArrayViews } from "../allocators";
 import { quadraticBezierToBoundingBox } from "../primitives/quadratic_bezier";
+import { triangleToBoundingBox } from "../primitives/mesh";
 
 const binCount = 3;
 const maxDepth = 64;
@@ -249,11 +250,13 @@ ctx.onmessage = ({ data: { objectsBuffer } }) => {
         const objectType = arrayViews.i32View[objectOffsetWords + 31];
 
         if (objectType != LowLevelStructure.None && partOfBVH) {
+            console.log(objectType);
             switch (objectType) {
                 case LowLevelStructure.Sphere: bboxes.push(sphereToBoundingBox(arrayViews, i)); break;
                 case LowLevelStructure.Cylinder: bboxes.push(cylinderToBoundingBox(objectsBuffer, i)); break;
                 case LowLevelStructure.RoundedCone: bboxes.push(roundedConeToBoundingBox(arrayViews, i)); break;
                 case LowLevelStructure.QuadraticBezierCurve: bboxes.push(quadraticBezierToBoundingBox(arrayViews, i)); break;
+                case LowLevelStructure.Triangle: bboxes.push(triangleToBoundingBox(arrayViews, i)); break;
                 default: continue;
             }
 

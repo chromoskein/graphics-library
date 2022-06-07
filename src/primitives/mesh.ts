@@ -1,8 +1,9 @@
 import { vec3, vec4 } from "gl-matrix";
-import { LinearImmutableArray } from "../allocators";
+import { ArrayViews, LinearImmutableArray } from "../allocators";
 import { LowLevelStructure, HighLevelStructure, LL_STRUCTURE_SIZE, LL_STRUCTURE_SIZE_BYTES } from "./shared";
 import { writeSphereToArrayBuffer } from "./sphere";
 import { GraphicsLibrary } from "..";
+import { BoundingBox, BoundingBoxCalculateCenter, BoundingBoxEmpty, BoundingBoxExtendByPoint } from "../shared";
 
 // GPU: 36 bytes, 9 words/floats
 export type Vertex = {
@@ -12,6 +13,38 @@ export type Vertex = {
 };
 
 export type Triangle = Array<Vertex>;
+
+export function triangleToBoundingBox(array: ArrayViews, offset: number): BoundingBox {
+    const result = BoundingBoxEmpty();
+
+    const p0 = vec3.fromValues(
+        array.f32View[offset * LL_STRUCTURE_SIZE + 0],
+        array.f32View[offset * LL_STRUCTURE_SIZE + 1],
+        array.f32View[offset * LL_STRUCTURE_SIZE + 2]
+    );
+    const p1 = vec3.fromValues(
+        array.f32View[offset * LL_STRUCTURE_SIZE + 4],
+        array.f32View[offset * LL_STRUCTURE_SIZE + 5],
+        array.f32View[offset * LL_STRUCTURE_SIZE + 6]
+    );
+    const p2 = vec3.fromValues(
+        array.f32View[offset * LL_STRUCTURE_SIZE + 8],
+        array.f32View[offset * LL_STRUCTURE_SIZE + 9],
+        array.f32View[offset * LL_STRUCTURE_SIZE + 10]
+    );
+    
+    const radius = array.f32View[offset * LL_STRUCTURE_SIZE + 3];
+    
+    BoundingBoxExtendByPoint(result, p0);
+    BoundingBoxExtendByPoint(result, p1);
+    BoundingBoxExtendByPoint(result, p2);
+
+    BoundingBoxCalculateCenter(result);
+    
+    console.log(result);
+
+    return result;
+}
 
 export class Mesh extends HighLevelStructure {
     private graphicsLibrary: GraphicsLibrary;

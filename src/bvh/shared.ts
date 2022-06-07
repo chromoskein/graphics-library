@@ -1,4 +1,4 @@
-import { vec3, vec4 } from "gl-matrix";
+import { vec3, vec3, vec4 } from "gl-matrix";
 import { CullObject, CullPlane } from "../culling";
 import { LL_STRUCTURE_SIZE_BYTES, LowLevelStructure } from "../primitives";
 import { QuadraticBezier } from "../primitives/quadratic_bezier";
@@ -41,6 +41,7 @@ export function intersectPrimitive(primitive: DataView, ray: Ray, offset: number
         case 'AABB': result = intersectAABB(primitive, ray, offset); break;
         case 'RoundedCone': result = intersectRoundedConeWithCutPlanes(primitive, ray, offset, cullObjects); break;
         case 'QuadraticBezierCurve': result = intersectQuadraticBezier(primitive, ray, offset, cullObjects); break;
+        case 'Triangle': result = interesectTriangle(primitive, ray, offset, cullObjects); break;
         default: result = -1.0;
     }
 
@@ -288,6 +289,7 @@ export function intersectRoundedConeWithCutPlanes(roundedCone: DataView, ray: Ra
 
     return t;
 }
+
 export class RayBezierIntersection {
     co: vec3 = vec3.create();
     cd: vec3 = vec3.create();
@@ -434,7 +436,7 @@ export function rayQuadraticBezierIntersection(ray: Ray, curve: QuadraticBezier,
         for (let i = 0; i < 16; i = i + 1) {
             rci.co = curve.evaluate(t);
             rci.cd = curve.evaluateDifferential(t);
-      
+
             rci = rayBezierIntersectStep(rci, r);
 
             if (rci.phantom && Math.abs(rci.dt) < 0.01) {
@@ -532,4 +534,79 @@ export function intersectQuadraticBezier(buffer: DataView, ray: Ray, offset: num
     }
 
     return -1.0;
+}
+
+export function interesectTriangle(buffer: DataView, ray: Ray, offset: number, cullObjects: Array<CullObject> = []): number {
+    const byteOffset = offset * LL_STRUCTURE_SIZE_BYTES;
+    console.log('triangle interesct');
+
+    const v0 = vec3.fromValues(
+        buffer.getFloat32(byteOffset + 0, true),
+        buffer.getFloat32(byteOffset + 4, true),
+        buffer.getFloat32(byteOffset + 8, true),
+    );
+
+    const v1 = vec3.fromValues(
+        buffer.getFloat32(byteOffset + 16, true),
+        buffer.getFloat32(byteOffset + 20, true),
+        buffer.getFloat32(byteOffset + 24, true),
+    );
+
+    const v2 = vec3.fromValues(
+        buffer.getFloat32(byteOffset + 32, true),
+        buffer.getFloat32(byteOffset + 36, true),
+        buffer.getFloat32(byteOffset + 40, true),
+    );
+
+    // compute plane's normal
+    const v0v1 = vec3.sub(vec3.create(), v1, v0);
+    const v0v2 = vec3.sub(vec3.create(), v2, v0);
+
+    // no need to normalize
+    const N = vec3.cross(vec3.create(), v0v1, v0v2);
+    const area2 = vec3.length(N);
+
+    // Step 1: finding P
+
+    // check if ray nd plane are parallel ?
+    const NdotRayDirection = vec3.dot(N, ray.direction);
+    if (Math.abs(NdotRayDirection) < 0.000001) {  //almost 0         
+        return -1.0;  //they are parallel so they don't intersect ! 
+    }
+
+    // compute d parameter using equation 2
+    const negN = vec3.negate(vec3.create(), N);
+    const d = vec3.dot(negN, v0);
+
+    // compute t (equation 3)
+    const t = -(vec3.dot(ray.origin, N) + d) / NdotRayDirection; 
+
+    // check if the triangle is in behind the ray
+    if (t < 0) return -1.0;  //the triangle is behind 
+
+    // compute the intersection point using equation 1
+    const P = vec3.add(vec3.create(), ray.origin, vec3.scale(vec3.create(), ray.direction, t)); 
+
+    // Step 2: inside-outside test
+    let C;  //vector perpendicular to triangle's plane 
+
+    // edge 0
+    const edge0 = vec3.sub(vec3.create(), v1, v0); 
+    const vp0 = vec3.sub(vec3.create(), P, v0); 
+    C = vec3.cross(vec3.create(), edge0, vp0); 
+    if (vec3.dot(N, C) < 0) return -1.0;  //P is on the right side 
+
+    // edge 1
+    const edge1 = vec3.sub(vec3.create(), v2, v1); 
+    const vp1 = vec3.sub(vec3.create(), P, v1); 
+    C = vec3.cross(vec3.create(), edge1, vp1); 
+    if (vec3.dot(N, C) < 0) return -1.0;  //P is on the right side 
+
+    // edge 2
+    const edge2 = vec3.sub(vec3.create(), v0, v2); 
+    const vp2 = vec3.sub(vec3.create(), P, v2); 
+    C = vec3.cross(vec3.create(), edge2, vp2); 
+    if (vec3.dot(N, C) < 0) return -1.0;  //P is on the right side 
+
+    return t;
 }

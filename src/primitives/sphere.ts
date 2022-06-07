@@ -114,7 +114,7 @@ export class Sphere implements HighLevelStructure {
         writeSphereToArrayBuffer(buffer, offset, {
             center: this._center,
             radius: this._radius,
-            color: this._color,
+            borderColor: this._color,
         });
 
         buffer.i32View.set([this.id], offset * LL_STRUCTURE_SIZE + 30);

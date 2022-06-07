@@ -185,8 +185,8 @@ export class ContinuousTube extends HighLevelStructure {
                     rightPlane: planes[i * 2 + 1],
                     color: this._colors[i],
                     color2: this._colors[i],
-                    borderColor: vec4.fromValues(1.0, 1.0, 1.0, 1.0),
-                    borderColor2: vec4.fromValues(1.0, 1.0, 1.0, 1.0),
+                    borderColor: this._borderColors[i],
+                    borderColor2: this._borderColors2[i],
                     borderRatio: this._borderRadius,
                 });
 
