@@ -34,17 +34,17 @@ export function rayTracingGBufferOutputBindGroupLayout(): GPUBindGroupLayoutDesc
                     viewDimension: '2d',
                 }
             },
+            // {
+            //     binding: 1,
+            //     visibility: GPUShaderStage.COMPUTE,
+            //     storageTexture: {
+            //         access: 'write-only',
+            //         format: 'rgba32float',
+            //         viewDimension: '2d',
+            //     }
+            // },
             {
                 binding: 1,
-                visibility: GPUShaderStage.COMPUTE,
-                storageTexture: {
-                    access: 'write-only',
-                    format: 'rgba32float',
-                    viewDimension: '2d',
-                }
-            },
-            {
-                binding: 2,
                 visibility: GPUShaderStage.COMPUTE,
                 storageTexture: {
                     access: 'write-only',
@@ -53,7 +53,7 @@ export function rayTracingGBufferOutputBindGroupLayout(): GPUBindGroupLayoutDesc
                 }
             },
             {
-                binding: 3,
+                binding: 2,
                 visibility: GPUShaderStage.COMPUTE,
                 storageTexture: {
                     access: 'write-only',
@@ -62,7 +62,7 @@ export function rayTracingGBufferOutputBindGroupLayout(): GPUBindGroupLayoutDesc
                 }
             },
             {
-                binding: 4,
+                binding: 3,
                 visibility: GPUShaderStage.VERTEX | GPUShaderStage.FRAGMENT | GPUShaderStage.COMPUTE,
                 buffer: {
                     type: 'uniform',
