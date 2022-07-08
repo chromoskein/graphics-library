@@ -33,8 +33,6 @@ export function triangleToBoundingBox(array: ArrayViews, offset: number): Boundi
         array.f32View[offset * LL_STRUCTURE_SIZE + 10]
     );
 
-    const radius = array.f32View[offset * LL_STRUCTURE_SIZE + 3];
-
     BoundingBoxExtendByPoint(result, p0);
     BoundingBoxExtendByPoint(result, p1);
     BoundingBoxExtendByPoint(result, p2);
@@ -94,6 +92,7 @@ export class Mesh extends HighLevelStructure {
                     const vertex = triangle[v];
 
                     f32View.set(vertex.position, localOffsetWords + v * 4);
+                    f32View.set(vertex.normal, localOffsetWords + 12 + v * 4);
                     u8View.set([vertex.color[0] * 255, vertex.color[1] * 255, vertex.color[2] * 255, vertex.color[3] * 255], localOffsetBytes + 96 + v * 4);
                 }
 
