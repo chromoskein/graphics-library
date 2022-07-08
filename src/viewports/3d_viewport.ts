@@ -545,143 +545,143 @@ export class Viewport3D {
 
     //#endregion
 
-    // if (this.ao) {
-    //   if (this.rayTraceAO) {
-    //     this._scene.renderRayTracingAmbientOcclusion({
-    //       width: this.width,
-    //       height: this.height,
-    //       cameraBindGroup: cameraBindGroup,
-    //       gBufferBindGroup: device.createBindGroup({
-    //         layout: this.graphicsLibrary.bindGroupLayouts.rayTracingAmbientOcclusionOutput,
-    //         entries: [
-    //           { binding: 0, resource: this.depthTexture.createView() },
-    //           { binding: 1, resource: this.gBuffer.worldNormals.createView() },
-    //           { binding: 2, resource: this.gBuffer.ambientOcclusion[0].createView() },
-    //           {
-    //             binding: 3,
-    //             resource: {
-    //               buffer: this.gBuffer.globalsGPU,
-    //             },
-    //           }
-    //         ]
-    //       }),
-    //       passEncoder: computePassEncoder,
-    //     });
-    //   } else {
-    //     this._scene.renderScreenSpaceAmbientOcclusion({
-    //       width: this.width,
-    //       height: this.height,
-    //       cameraBindGroup: cameraBindGroup,
-    //       gBufferBindGroup: device.createBindGroup({
-    //         layout: this.graphicsLibrary.bindGroupLayouts.ssaoGBuffer,
-    //         entries: [
-    //           { binding: 0, resource: this.depthTexture.createView() },
-    //           { binding: 1, resource: this.gBuffer.worldNormals.createView() },
-    //           { binding: 2, resource: this.gBuffer.ambientOcclusion[0].createView() }
-    //         ]
-    //       }),
-    //       ssaoBindGroup: device.createBindGroup({
-    //         layout: this.graphicsLibrary.bindGroupLayouts.ssaoGlobals,
-    //         entries: [
-    //           { binding: 0, resource: { buffer: this._ssaoGlobalsGPU } },
-    //           { binding: 1, resource: this.graphicsLibrary.nearestRepeatSampler },
-    //           { binding: 2, resource: this._ssaoNoiseTexure.createView() }
-    //         ]
-    //       }),
-    //       passEncoder: computePassEncoder,
-    //     });
+    if (this.ao) {
+      if (this.rayTraceAO) {
+        this._scene.renderRayTracingAmbientOcclusion({
+          width: this.width,
+          height: this.height,
+          cameraBindGroup: cameraBindGroup,
+          gBufferBindGroup: device.createBindGroup({
+            layout: this.graphicsLibrary.bindGroupLayouts.rayTracingAmbientOcclusionOutput,
+            entries: [
+              { binding: 0, resource: this.depthTexture.createView() },
+              { binding: 1, resource: this.gBuffer.worldNormals.createView() },
+              { binding: 2, resource: this.gBuffer.ambientOcclusion[0].createView() },
+              {
+                binding: 3,
+                resource: {
+                  buffer: this.gBuffer.globalsGPU,
+                },
+              }
+            ]
+          }),
+          passEncoder: computePassEncoder,
+        });
+      } else {
+        this._scene.renderScreenSpaceAmbientOcclusion({
+          width: this.width,
+          height: this.height,
+          cameraBindGroup: cameraBindGroup,
+          gBufferBindGroup: device.createBindGroup({
+            layout: this.graphicsLibrary.bindGroupLayouts.ssaoGBuffer,
+            entries: [
+              { binding: 0, resource: this.depthTexture.createView() },
+              { binding: 1, resource: this.gBuffer.worldNormals.createView() },
+              { binding: 2, resource: this.gBuffer.ambientOcclusion[0].createView() }
+            ]
+          }),
+          ssaoBindGroup: device.createBindGroup({
+            layout: this.graphicsLibrary.bindGroupLayouts.ssaoGlobals,
+            entries: [
+              { binding: 0, resource: { buffer: this._ssaoGlobalsGPU } },
+              { binding: 1, resource: this.graphicsLibrary.nearestRepeatSampler },
+              { binding: 2, resource: this._ssaoNoiseTexure.createView() }
+            ]
+          }),
+          passEncoder: computePassEncoder,
+        });
 
-    //     this._scene.renderScreenSpaceAmbientOcclusion({
-    //       width: this.width,
-    //       height: this.height,
-    //       cameraBindGroup: cameraBindGroup,
-    //       gBufferBindGroup: device.createBindGroup({
-    //         layout: this.graphicsLibrary.bindGroupLayouts.ssaoGBuffer,
-    //         entries: [
-    //           { binding: 0, resource: this.depthTexture.createView() },
-    //           { binding: 1, resource: this.gBuffer.worldNormals.createView() },
-    //           { binding: 2, resource: this.gBuffer.ambientOcclusion[1].createView() }
-    //         ]
-    //       }),
-    //       ssaoBindGroup: device.createBindGroup({
-    //         layout: this.graphicsLibrary.bindGroupLayouts.ssaoGlobals,
-    //         entries: [
-    //           { binding: 0, resource: { buffer: this._ssaoGlobalsFarGPU } },
-    //           { binding: 1, resource: this.graphicsLibrary.nearestRepeatSampler },
-    //           { binding: 2, resource: this._ssaoNoiseTexure.createView() }
-    //         ]
-    //       }),
-    //       passEncoder: computePassEncoder,
-    //     });
-    //   }
+        this._scene.renderScreenSpaceAmbientOcclusion({
+          width: this.width,
+          height: this.height,
+          cameraBindGroup: cameraBindGroup,
+          gBufferBindGroup: device.createBindGroup({
+            layout: this.graphicsLibrary.bindGroupLayouts.ssaoGBuffer,
+            entries: [
+              { binding: 0, resource: this.depthTexture.createView() },
+              { binding: 1, resource: this.gBuffer.worldNormals.createView() },
+              { binding: 2, resource: this.gBuffer.ambientOcclusion[1].createView() }
+            ]
+          }),
+          ssaoBindGroup: device.createBindGroup({
+            layout: this.graphicsLibrary.bindGroupLayouts.ssaoGlobals,
+            entries: [
+              { binding: 0, resource: { buffer: this._ssaoGlobalsFarGPU } },
+              { binding: 1, resource: this.graphicsLibrary.nearestRepeatSampler },
+              { binding: 2, resource: this._ssaoNoiseTexure.createView() }
+            ]
+          }),
+          passEncoder: computePassEncoder,
+        });
+      }
 
-    //   computePassEncoder.setPipeline(this.graphicsLibrary.computePipelines.ssaoJoin);
-    //   computePassEncoder.setBindGroup(0,
-    //     device.createBindGroup({
-    //       layout: this.graphicsLibrary.bindGroupLayouts.ssaoJoin,
-    //       entries: [
-    //         { binding: 0, resource: this.gBuffer.ambientOcclusion[0].createView() },
-    //         { binding: 1, resource: this.gBuffer.ambientOcclusion[1].createView() },
-    //         { binding: 2, resource: this.gBuffer.ambientOcclusion[2].createView() },
-    //       ],
-    //     })
-    //   );
-    //   computePassEncoder.dispatchWorkgroups(
-    //     Math.ceil((this.width + 7) / 8),
-    //     Math.ceil((this.height + 7) / 8),
-    //   );
+      computePassEncoder.setPipeline(this.graphicsLibrary.computePipelines.ssaoJoin);
+      computePassEncoder.setBindGroup(0,
+        device.createBindGroup({
+          layout: this.graphicsLibrary.bindGroupLayouts.ssaoJoin,
+          entries: [
+            { binding: 0, resource: this.gBuffer.ambientOcclusion[0].createView() },
+            { binding: 1, resource: this.gBuffer.ambientOcclusion[1].createView() },
+            { binding: 2, resource: this.gBuffer.ambientOcclusion[2].createView() },
+          ],
+        })
+      );
+      computePassEncoder.dispatchWorkgroups(
+        Math.ceil((this.width + 7) / 8),
+        Math.ceil((this.height + 7) / 8),
+      );
 
-    //   computePassEncoder.setPipeline(this.graphicsLibrary.computePipelines.ambientOcclusionBlur);
-    //   computePassEncoder.setBindGroup(0,
-    //     device.createBindGroup({
-    //       layout: this.graphicsLibrary.bindGroupLayouts.aoBlurIO,
-    //       entries: [
-    //         { binding: 0, resource: this.gBuffer.ambientOcclusion[2].createView() },
-    //         { binding: 1, resource: this.gBuffer.worldNormals.createView() },
-    //         { binding: 2, resource: this.depthTexture.createView() },
-    //         { binding: 3, resource: this.gBuffer.ambientOcclusion[1].createView() },
-    //       ],
-    //     })
-    //   );
-    //   computePassEncoder.dispatchWorkgroups(
-    //     Math.ceil((this.width + 7) / 8),
-    //     Math.ceil((this.height + 7) / 8),
-    //   );
-    // }
-
-    // if (!this.rayTraceGBuffer) {
-    //   const gBufferRasterizeTransparentPass = commandEncoder.beginRenderPass({
-    //     colorAttachments: [
-    //       {
-    //         view: this.gBuffer.colorsTransparent.createView(),
-    //         clearValue: { r: 0.0, g: 0.0, b: 0.0, a: 0.0 },
-    //         loadOp: 'clear',
-    //         storeOp: 'store',
-    //       }
-    //     ],
-    //     depthStencilAttachment: {
-    //       view: this.depthTexture.createView(),
-
-    //       depthLoadOp: 'load',
-    //       depthStoreOp: 'discard',
-    //     }
-    //   });
-
-    //   gBufferRasterizeTransparentPass.setBindGroup(0, device.createBindGroup({
-    //     label: "Camera BG",
-    //     layout: bindGroupLayouts.camera,
-    //     entries: [
-    //       {
-    //         binding: 0, resource: { buffer: this._camera.bufferGPU, offset: 0 }
-    //       },
-    //     ]
-    //   }));
-    //   gBufferRasterizeTransparentPass.setBindGroup(2, cullObjectsBindGroup);
-    //   this.scene.renderRasterization(gBufferRasterizeTransparentPass, this._camera, RenderObjects.Transparent, this.depthTexture.createView());
-    //   gBufferRasterizeTransparentPass.end();
-    // }
+      computePassEncoder.setPipeline(this.graphicsLibrary.computePipelines.ambientOcclusionBlur);
+      computePassEncoder.setBindGroup(0,
+        device.createBindGroup({
+          layout: this.graphicsLibrary.bindGroupLayouts.aoBlurIO,
+          entries: [
+            { binding: 0, resource: this.gBuffer.ambientOcclusion[2].createView() },
+            { binding: 1, resource: this.gBuffer.worldNormals.createView() },
+            { binding: 2, resource: this.depthTexture.createView() },
+            { binding: 3, resource: this.gBuffer.ambientOcclusion[1].createView() },
+          ],
+        })
+      );
+      computePassEncoder.dispatchWorkgroups(
+        Math.ceil((this.width + 7) / 8),
+        Math.ceil((this.height + 7) / 8),
+      );
+    }
 
     computePassEncoder.end();
+
+    if (!this.rayTraceGBuffer) {
+      const gBufferRasterizeTransparentPass = commandEncoder.beginRenderPass({
+        colorAttachments: [
+          {
+            view: this.gBuffer.colorsTransparent.createView(),
+            clearValue: { r: 0.0, g: 0.0, b: 0.0, a: 0.0 },
+            loadOp: 'clear',
+            storeOp: 'store',
+          }
+        ],
+        depthStencilAttachment: {
+          view: this.depthTexture.createView(),
+
+          depthLoadOp: 'load',
+          depthStoreOp: 'discard',
+        }
+      });
+
+      gBufferRasterizeTransparentPass.setBindGroup(0, device.createBindGroup({
+        label: "Camera BG",
+        layout: bindGroupLayouts.camera,
+        entries: [
+          {
+            binding: 0, resource: { buffer: this._camera.bufferGPU, offset: 0 }
+          },
+        ]
+      }));
+      gBufferRasterizeTransparentPass.setBindGroup(2, cullObjectsBindGroup);
+      this.scene.renderRasterization(gBufferRasterizeTransparentPass, this._camera, RenderObjects.Transparent, this.depthTexture.createView());
+      gBufferRasterizeTransparentPass.end();
+    }    
 
     const passthroughPassEncoder = commandEncoder.beginRenderPass({
       colorAttachments: [

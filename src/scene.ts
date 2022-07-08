@@ -397,6 +397,13 @@ export class Scene {
         return structureID;
     }
 
+    public clear(): void {
+        this._structures = [];
+        this._objectsSum = 0;
+        this.nameToStructure = new Map();
+        this.objectTypesCount = new Array(128);
+    }
+
     public removeStructureByID(structureID: number, update = true): void {
         const structureIndex = this._structures.findIndex(s => s.getID() == structureID);
 

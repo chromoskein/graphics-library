@@ -355,7 +355,7 @@ fn main(@builtin(global_invocation_id) GlobalInvocationID: vec3<u32>) {
     var color = vec4<f32>(0.0, 0.0, 0.0, 1.0);
     let maximum = 2;
     var colors: array<vec4<f32>, 4> = array<vec4<f32>, 4>(vec4<f32>(0.0), vec4<f32>(0.0), vec4<f32>(0.0), vec4<f32>(0.0));
-    for (var i = 0; i < maximum; i++) {
+    // for (var i = 0; i < maximum; i++) {
         let hit = closestRayIntersection(ray);
 
         if (hit.t > 0.0) {
@@ -365,33 +365,33 @@ fn main(@builtin(global_invocation_id) GlobalInvocationID: vec3<u32>) {
 
             // color = (1.0 - max(ao, 0.25)) * hit.color;
             // color = vec4<f32>(vec3<f32>(0.5) + 0.5 * hit.normal.xyz, 1.0);
-            colors[i].x = ao * hit.color.x;
-            colors[i].y = ao * hit.color.y;
-            colors[i].z = ao * hit.color.z;
-            colors[i].w = 1.0;
+            colors[0].x = ao * hit.color.x;
+            colors[0].y = ao * hit.color.y;
+            colors[0].z = ao * hit.color.z;
+            colors[0].w = 1.0;
 
             hits = hits + 1;
             ray.origin = ray.origin + hit.t * ray.direction + 0.00001 * ray.direction;
         } 
-        else {
-            break;
-        }
-    }
+    //     else {
+    //         break;
+    //     }
+    // }
 
-    // textureStore(gBufferColors, vec2<i32>(GlobalInvocationID.xy), vec4<f32>(colors[0].xyz, 1.0));
+    textureStore(gBufferColors, vec2<i32>(GlobalInvocationID.xy), vec4<f32>(colors[0].xyz, 1.0));
 
-    var final_color: vec4<f32> = colors[0];
-    if (hits > 0) {
-        final_color = colors[hits - 1];
+    // var final_color: vec4<f32> = colors[0];
+    // if (hits > 0) {
+    //     final_color = colors[hits - 1];
 
-        // for (var i = 0; i < hits - 1; i++) {
-        //     let j = hits - 1 - i;
-        //     var source_color = colors[j];
-        //     var destination_color = final_color;
+    //     // for (var i = 0; i < hits - 1; i++) {
+    //     //     let j = hits - 1 - i;
+    //     //     var source_color = colors[j];
+    //     //     var destination_color = final_color;
 
-        //     final_color = source_color.a * source_color + (1.0 - destination_color.a) * destination_color;
-        // }
-    }
+    //     //     final_color = source_color.a * source_color + (1.0 - destination_color.a) * destination_color;
+    //     // }
+    // }
 
-    textureStore(gBufferColors, vec2<i32>(GlobalInvocationID.xy), vec4<f32>(final_color.xyz, 1.0));
+    // textureStore(gBufferColors, vec2<i32>(GlobalInvocationID.xy), vec4<f32>(final_color.xyz, 1.0));
 }
