@@ -33,38 +33,7 @@ export function createShaderModules(device: GPUDevice): ShaderModules {
     const primitivesBase = math + rayTracing + primitivesShared;
 
     const shaders = {
-        //#region Rasterization - primitives
-        trianglesWriteDepth: device.createShaderModule({ code: primitivesBase + triangles(true) }),
-        trianglesDiscardDepth: device.createShaderModule({ code: primitivesBase + triangles(false) }),
-        spheresWriteDepth: device.createShaderModule({ code: primitivesBase + spheres(true) }),
-        spheresDiscardDepth: device.createShaderModule({ code: primitivesBase + spheres(false) }),
-        cylindersWriteDepth: device.createShaderModule({ code: primitivesBase + cylinders(true) }),
-        cylindersDiscardDepth: device.createShaderModule({ code: primitivesBase + cylinders(false) }),
-        quadraticBeziersWriteDepth: device.createShaderModule({ code: primitivesBase + primitiveBeziers + beziers(true) }),
-        quadraticBeziersDiscardDepth: device.createShaderModule({ code: primitivesBase + primitiveBeziers + beziers(false) }),
-        aabbsWriteDepth: device.createShaderModule({ code: primitivesBase + aabbs(true) }),
-        aabbsDiscardDepth: device.createShaderModule({ code: primitivesBase + aabbs(false) }),
-        roundedConesWriteDepth: device.createShaderModule({ code: primitivesBase + roundedCones(true) }),
-        roundedConesDiscardDepth: device.createShaderModule({ code: primitivesBase + roundedCones(false) }),
-        //#endregion
-
-        //#region Ray-Tracing
-        rayTracingGBuffer: device.createShaderModule({ code: primitivesBase + rayTracingGBuffer }),
-        rayTracingAmbientOcclusion: device.createShaderModule({ code: primitivesBase + rayTracingAmbientOcclusion }),
-        //#endregion
-
-        //#region 2D
-        tadmap: device.createShaderModule({ code: tadmap }),
-        distanceMap: device.createShaderModule({ code: distanceMap }),
-        //#endregion
-
-        //#region Post-Process
         passthrough: device.createShaderModule({ code: passthrough }),
-        renderGBuffer: device.createShaderModule({ code: renderGBuffer }),
-        ssao: device.createShaderModule({ code: ssao }),
-        ssaoJoin: device.createShaderModule({ code: ssaoJoin }),
-        aoBlur: device.createShaderModule({ code: aoBlur }),
-        //#endregion
     };
 
     // console.timeEnd('createShaderModules');

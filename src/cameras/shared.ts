@@ -88,8 +88,7 @@ export class Camera {
     protected _event_started_elsewhere = false;
     protected _ignoreEvents = false;
 
-
-
+    protected _version: number = 1;
 
     constructor(device: GPUDevice, width: number, height: number, near = 0.01, fieldOfView = 45.0) {
         this._width = width;
@@ -189,6 +188,8 @@ export class Camera {
      * updateCPU
      */
     protected updateCPU(dt: number): void {
+        this._version++;
+
         switch (this._projectionType) {
             case ProjectionType.Perpsective: {
                 const ratio = this._width / this._height;
@@ -226,9 +227,15 @@ export class Camera {
         this.buffer.set(position, 112);
         this.buffer.set([0.0], 115);
         this.buffer.set([this._width, this._height], 116);
+
+        this._dirty = true;
     }
 
     public updateGPU(queue: GPUQueue): void {
+        if (!this._dirty) {
+            return;
+        }
+
         queue.writeBuffer(
             this.bufferGPU,
             0,
@@ -271,5 +278,9 @@ export class Camera {
 
     public onKeyDown(event: KeyboardEvent) {
 
+    }
+
+    public get version(): number {
+        return this._version;
     }
 }

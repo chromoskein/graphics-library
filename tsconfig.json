@@ -12,12 +12,12 @@
         "strict": true,
         "noImplicitReturns": true,
         "noFallthroughCasesInSwitch": true,
-        // "noUnusedLocals": false,
+        // "noUnusedLocals": true,
         // "noUnusedParameters": true,
-        // "noImplicitAny": true,
+        "noImplicitAny": true,
         "forceConsistentCasingInFileNames": true,
         // Disable pure javascript.
-        "allowJs": false,
+        "allowJs": true,
         "allowSyntheticDefaultImports": true,
         "moduleResolution": "node",
         "typeRoots": [ "./node_modules/@webgpu/types", "./node_modules/@types", "./node_modules/@resize-observer-browser"]

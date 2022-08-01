@@ -27,6 +27,8 @@ export class Ortho2DCamera {
     protected _event_started_elsewhere = false;
     protected _ignoreEvents = false;
 
+    protected _version: number = 0;
+
     constructor(device: GPUDevice, width: number, height: number) {
         this._width = width;
         this._height = height;
@@ -291,5 +293,9 @@ export class Ortho2DCamera {
 
     public onMouseLeave(event: MouseEvent) {
         this.mousePressed = false;
+    }
+
+    public get version(): number {
+        return this._version;
     }
 }

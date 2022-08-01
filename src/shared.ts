@@ -1,23 +1,9 @@
 import { vec3, vec4 } from "gl-matrix";
 
-export class Hit {
-    ray: Ray;
-    distance: number;
-
-    lowLevelIndex: number;
-    highLevelIndex: number;
-
-    constructor(ray: Ray, distance: number, lowlLevelIndex: number, highLevelIndex: number) {
-        this.ray = ray;
-        this.distance = distance;
-        this.lowLevelIndex = lowlLevelIndex;
-        this.highLevelIndex = highLevelIndex;
-    }
-}
-
 export class Ray {
     origin: vec3 = vec3.fromValues(0.0, 0.0, 0.0);
     direction: vec3 = vec3.fromValues(0.0, 0.0, 0.0);
+    
     minT = 0.0;
     maxT = Number.MAX_VALUE;
 
@@ -25,6 +11,11 @@ export class Ray {
         this.origin = origin;
         this.direction = direction;
     }
+}
+
+export type Intersection = {
+    ray: Ray;
+    distance: number
 }
 
 export type BoundingBox = {
