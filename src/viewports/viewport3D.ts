@@ -11,7 +11,7 @@ export class Viewport3D extends Viewport {
     }
 
     async render(textureView: GPUTextureView, frametime: number): Promise<void> {
-        super.render(textureView, frametime);
+        await super.render(textureView, frametime);
 
         // Prepare
         const device = this.graphicsLibrary.device;
@@ -43,9 +43,6 @@ export class Viewport3D extends Viewport {
         deferredRenderPass.end();
         
         const commandBuffer = commandEncoder.finish();
-
-
-        console.log('submit shit', this.width, this.height);
         //#endregion Render
 
         // Submit

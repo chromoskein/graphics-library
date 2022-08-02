@@ -12,7 +12,7 @@ export abstract class Viewport {
   protected _camera: OrbitCamera | SmoothCamera | null = null;
 
   //#region Options
-  public backgroundColor: GPUColorDict = { r: 0.0, g: 0.0, b: 0.0, a: 1.0 };
+  public backgroundColor: GPUColorDict = { r: 0.2, g: 1.0, b: 1.0, a: 1.0 };
   //#endregion
 
   protected _lastFrametime = 0;
@@ -136,8 +136,6 @@ export abstract class Viewport {
 
     //   return;
     // }
-
-    console.log(this._camera);
 
     this._camera.updateGPU(device.queue);
     this._scene.uploadModified(device.queue);

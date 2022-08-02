@@ -42,6 +42,7 @@ export abstract class Allocator {
     }
 
     public abstract allocate(size: number): Allocation;
+    public abstract deallocate(): void;
     public abstract deallocate(allocation: Allocation): void;
 
     public cpuBuffer(): ArrayBuffer {

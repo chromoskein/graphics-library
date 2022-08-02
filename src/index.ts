@@ -1,5 +1,5 @@
-import { Camera, OrbitCamera } from "./cameras/index";
-import { SmoothCamera } from "./cameras/smooth";
+import type { Camera, OrbitCamera } from "./cameras/index";
+import type { SmoothCamera } from "./cameras/smooth";
 import { Sphere } from "./rendering/objects/parametric";
 import { Scene } from "./scene";
 import { Viewport3D } from "./viewports/index";
@@ -32,6 +32,7 @@ export class GraphicsLibrary {
         this._device = device;
 
         this.bindGroupLayouts.set('camera', device.createBindGroupLayout({
+            label: 'Camera BGL',
             entries: [{
                 binding: 0,
                 visibility: GPUShaderStage.VERTEX | GPUShaderStage.FRAGMENT,

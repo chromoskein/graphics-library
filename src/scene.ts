@@ -41,6 +41,8 @@ export class Scene {
     }
 
     public deallocate(): void {
+        this._objects = [];
+        this._allocator.deallocate();
     }
 
     public buildBVH(): void {
@@ -127,6 +129,8 @@ export class Scene {
 
         this._version++;
 
+        console.log('addObject::', this._objects);
+
         return [object, objectID];
     }
 
@@ -135,9 +139,16 @@ export class Scene {
     }
 
     public removeObjectByID(objectID: number): void {
+        const objectIndex = this._objects.findIndex((object) => object.id === objectID);
+
+        if (objectIndex >= 0) {
+            this._objects = this._objects.splice(objectIndex);
+        }
     }
 
     public uploadModified(queue: GPUQueue): void {
+        console.log(this._objects);
+        
         for(const object of this._objects) {
             if (object instanceof ConcreteObject) {
                 object.update();
@@ -146,7 +157,7 @@ export class Scene {
 
         for(const object of this._objects) {
             if (object instanceof ConcreteObject) {
-                if (object.dirty) {
+                // if (object.dirty) {
                     const allocation = object.allocation;
 
                     if (!allocation) {
@@ -160,7 +171,7 @@ export class Scene {
                         allocation.allocationRange.offset, 
                         allocation.allocationRange.size
                     );
-                }
+                // }
             }
         }
     }

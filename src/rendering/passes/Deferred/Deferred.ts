@@ -6,6 +6,7 @@ import { parametricShaderTemplate } from "./ParametricShaderTemplate";
 
 class Pipelines {
     private static _instance: Pipelines;
+    private static _lastDeviceUsed: GPUDevice;
 
     public shaderModules: Map<string, GPUShaderModule>;
     public bindGroupLayouts: Map<string, GPUBindGroupLayout>;
@@ -87,10 +88,16 @@ class Pipelines {
                 // },
             }));
         }
+
+        Pipelines._lastDeviceUsed = graphicsLibrary.device;
     }
 
     public static getInstance(graphicsLibrary: GraphicsLibrary): Pipelines {
-        return this._instance || (this._instance = new this(graphicsLibrary));
+        if (this._instance && Pipelines._lastDeviceUsed == graphicsLibrary.device) {
+            return this._instance;
+        }
+
+        return this._instance = new this(graphicsLibrary);
     }
 }
 

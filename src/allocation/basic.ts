@@ -76,7 +76,11 @@ export class BasicAllocator extends Allocator {
         }
     }
 
-    public deallocate(allocation: Allocation): void {
+    public deallocate(): void {
+        this._allocations = [];
+        this._gpuBuffer.destroy();
+    }
 
+    public deallocate(allocation: Allocation): void {
     }
 }

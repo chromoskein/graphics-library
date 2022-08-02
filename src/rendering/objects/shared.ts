@@ -40,15 +40,15 @@ export abstract class ConcreteObject extends IObject {
     public abstract onMoved(): void;
 
     public update(): void {
-        if (this._allocation && this._allocation.allocationRange.moved) {
+        // if (this._allocation?.allocationRange.moved) {
             this.onMoved();
             this._allocation.allocationRange.moved = false;
             this.setDirty();
-        }        
+        // }        
 
-        if (this._allocation && this.dirty) {
+        // if (this._allocation && this.dirty) {
             this.toBuffer(this._allocation.cpuBuffer, this._allocation.allocationRange.offset);
-        }
+        // }
     }
 
     public abstract record(encoder: GPURenderPassEncoder, bindGroupLayoutsOffset: number): void;

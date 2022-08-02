@@ -5,9 +5,9 @@ import * as r from 'restructure';
 import { vec3, vec4 } from "gl-matrix";
 
 export interface SphereProperties {
-    center: vec3,
+    center: [number, number, number],
     radius: number,
-    color: vec4,
+    color: [number, number, number, number],
 }
 
 export const SphereStruct = new r.Struct({
@@ -17,30 +17,28 @@ export const SphereStruct = new r.Struct({
 });
 
 export class Sphere extends IParametricObject {
-    public static variableName: string = 'sphere';
-    public static typeName: string = 'Sphere';
+    public static variableName = 'sphere';
+    public static typeName = 'Sphere';
 
     public get variableName(): string { return Sphere.variableName; }
     public get typeName(): string { return Sphere.typeName; }
 
-    protected _allocation: Allocation;
-
     static bindGroupLayouts: Array<GPUBindGroupLayout> = [];
-    static createBindGroupLayouts(device: GPUDevice) {
-        console.log('hello from here');
-        Sphere.bindGroupLayouts.push(device.createBindGroupLayout({
+    static createBindGroupLayouts(device: GPUDevice): void {
+        Sphere.bindGroupLayouts = [device.createBindGroupLayout({
+            label: 'Sphere',
             entries: [{
                 binding: 0,
                 visibility: GPUShaderStage.VERTEX | GPUShaderStage.FRAGMENT,
                 buffer: { type: 'uniform' },
             }]
-        }));
+        })];
     }
 
     public properties: SphereProperties;
 
     //#region GPU Code
-    public static gpuCodeGlobals: string = `
+    public static gpuCodeGlobals = /* wgsl */`
         struct ${this.typeName} {
             center: vec3<f32>,
             radius: f32,
@@ -50,12 +48,12 @@ export class Sphere extends IParametricObject {
         @group(1) @binding(0) var<uniform> ${this.variableName}: ${this.typeName};
     `;
 
-    public static gpuCodeGetObject: string = ``;
-    public static gpuCodeGetObjectUntypedArray: string = `
+    public static gpuCodeGetObject = ``;
+    public static gpuCodeGetObjectUntypedArray = `
         let ${this.variableName}: ${this.typeName} = ${this.typeName}(vec3<f32>(words[0], words[1], words[2]), words[3]);
     `;
 
-    static gpuCodeIntersectionTest: string = /* wgsl */`
+    static gpuCodeIntersectionTest = /* wgsl */`
         fn ray${this.typeName}Intersection(ray: Ray, ${this.variableName}: ${this.typeName}) -> Intersection {
             let oc = ray.origin - ${this.variableName}.center;
             let b = dot( oc, ray.direction );
@@ -100,7 +98,7 @@ export class Sphere extends IParametricObject {
         }
     }
 
-    static gpuCodeGetBoundingRectangleVertex: string = `
+    static gpuCodeGetBoundingRectangleVertex = `
         let boundingRectangleVertex = sphereToBoundingRectangleVertex(${this.variableName}.center.xyz, ${this.variableName}.radius, VertexIndex);
     `;
     //#endregion GPU Code
@@ -125,8 +123,7 @@ export class Sphere extends IParametricObject {
         this.onMoved();
     }
 
-    public onMoved() {
-        console.log('onMoved', new Float32Array(this._allocation.cpuBuffer));
+    public onMoved(): void {
         this._bindGroup = this._graphicsLibrary.device.createBindGroup({
             layout: Sphere.bindGroupLayouts[0],
             entries: [
@@ -142,12 +139,10 @@ export class Sphere extends IParametricObject {
         this.toBuffer(this._allocation.cpuBuffer, this._allocation.allocationRange.offset);
     }
 
-    public record(encoder: GPURenderPassEncoder, bindGroupLayoutsOffset = 1) {
+    public record(encoder: GPURenderPassEncoder, bindGroupLayoutsOffset = 1): void {
         if (!this._bindGroup) {
             return;
         }
-
-        console.log('record sphere');
 
         // Set bind group
         encoder.setBindGroup(bindGroupLayoutsOffset + 0, this._bindGroup);
@@ -156,9 +151,8 @@ export class Sphere extends IParametricObject {
         encoder.draw(4, 1, 0, 0);
     }
 
-    public toBuffer(buffer: ArrayBuffer, offset: number): void {        
+    public toBuffer(buffer: ArrayBuffer, offset: number): void {
         const u8View = new Uint8Array(buffer, offset);
-        // console.log('toBuffer', new Float32Array(buffer), u8View);
         u8View.set(SphereStruct.toBuffer(this.properties), 0);
     }
 }
